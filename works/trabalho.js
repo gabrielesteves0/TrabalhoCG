@@ -43,16 +43,16 @@ function keyboardUpdate(){
 }
 
 
-// Show axes (parameter is size of each axis)
+
 var axesHelper = new THREE.AxesHelper( 12 );
 scene.add( axesHelper );
 
+//Vetores para auxiliar no controle das muniçoes, planos e inimigos
 var ammo = [];
 var planes = [];
 var enemies = [];
 
 // Loop que cria os planos
-
 for(let i=0; i<3; i++){
     let plane = createGroundPlaneWired(200, 400);
     scene.add(plane);
@@ -60,12 +60,13 @@ for(let i=0; i<3; i++){
     planes.push(plane);
 }
 
+
 let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshLambertMaterial(255,0,0));
 aviao.rotateX(degreesToRadians(-90));
 aviao.translateZ(10);
 scene.add(aviao);
 
-
+//Função que move os planos
 function movePlanes(){
     planes.forEach(item => {
         item.translateY(-1);
@@ -78,6 +79,7 @@ function movePlanes(){
 
 let target = new THREE.Vector3(0,0,0);
 
+//Função que cria os tiros
 function createAmmo(){
     let shoot = new THREE.Mesh(new THREE.SphereGeometry(1, 0, 0), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
     aviao.getWorldPosition(target);
@@ -86,33 +88,47 @@ function createAmmo(){
     ammo.push(shoot);
 }
 
-function shoot(){
+//Função que move os tiros
+function moveShoot(){
     ammo.forEach(item => {
         item.translateZ(-1);
     });
 
 }
 
+//Função que deleta os tiros
 function deleteAmmo(){
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
-        console.log(item.position.z + aviao.position.z);
         if(item.position.z + aviao.position.z <= -150 | item.position.z + aviao.position.z >= 150){
             scene.remove(item);
         }
     })
 }
-//TODO: Função pra criar os inimigos
-/*
+
+//Função que cria os inimigos
 function createEnemies(){
-    let enemy = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
     let positionX = (Math.random() * 100);
-    let sinal = (Math.random());
-    enemy.position.set(target.x, target.y, target.z);
-    scene.add(shoot);
-    ammo.push(shoot);
+    let sinal = (Math.random()*2);
+    if(sinal >= 1)
+        positionX = positionX * (-1);
+    enemy.position.set(positionX, 10, -400);
+    scene.add(enemy);
+    enemies.push(enemy);
 }
-*/
+
+//Função que move os inimigos
+function moveEnemies(){
+    enemies.forEach(item => {
+        item.translateZ(1);
+        item.updateMatrixWorld(true);
+        if(item.position.z >= 150){
+            scene.remove(item);
+        }
+    })
+}
+
 
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
@@ -123,9 +139,13 @@ window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)},
 render();
 function render()
 {
+    let x = Math.random()*100;
+    if(x >= 98.5)
+        createEnemies();
     trackballControls.update();
+    moveEnemies();
     keyboardUpdate();
-    shoot();
+    moveShoot();
     deleteAmmo();
     movePlanes();
     requestAnimationFrame(render);
