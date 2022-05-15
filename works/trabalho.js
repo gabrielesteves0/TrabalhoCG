@@ -14,21 +14,23 @@ import KeyboardState from '../libs/util/KeyboardState.js';
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = initRenderer();    // View function in util/utils
-var camera = initCamera(new THREE.Vector3(0, 45, 90));
-initDefaultBasicLight(scene);
-/*
+//var camera = initCamera(new THREE.Vector3(0, 45, 90));
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.lookAt(0, 0, 0);
+  camera.position.set(3.6, 4.6, 8.2);
+  camera.up.set( 0, 1, 0 );
+initDefaultBasicLight(scene);
+
+
 var cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
-cameraHolder.translateY(60);
-cameraHolder.translateZ(60);
+cameraHolder.translateY(40);
+cameraHolder.translateZ(100);
+cameraHolder.translateX(5);
+cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
-camera.lookAt(100,0,0);
-camera.up.set(0.0, 1.0, 0.0);
-camera.position.set(0.0, 0.0, 1.0);
-*/
 
-// Enable mouse rotation, pan, zoom etc.
+
 
 var keyboard = new KeyboardState();
 
@@ -109,7 +111,7 @@ function deleteAmmo(){
 //Função que cria os inimigos
 function createEnemies(){
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
-    let positionX = (Math.random() * 100);
+    let positionX = (Math.random() * 90);
     let sinal = (Math.random()*2);
     if(sinal >= 1)
         positionX = positionX * (-1);
@@ -142,7 +144,7 @@ function render()
     let x = Math.random()*100;
     if(x >= 98.5)
         createEnemies();
-    trackballControls.update();
+    //trackballControls.update();
     moveEnemies();
     keyboardUpdate();
     moveShoot();
