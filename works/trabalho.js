@@ -55,9 +55,11 @@ var planes = [];
 var enemies = [];
 var velocidades = [];
 
+const box = new THREE.Box3();
+
 // Loop que cria os planos
 for(let i=0; i<3; i++){
-    let plane = createGroundPlaneWired(200, 400);
+    let plane = createGroundPlaneWired(400, 400);
     scene.add(plane);
     plane.position.set(0,0,-(400*i));
     planes.push(plane);
@@ -68,6 +70,21 @@ let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshLa
 aviao.rotateX(degreesToRadians(-90));
 aviao.translateZ(10);
 scene.add(aviao);
+
+let target = new THREE.Vector3(0,0,0);
+
+aviao.geometry.computeBoundingBox();
+
+
+
+/*
+let BBoxAviao = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 20), new THREE.MeshLambertMaterial(255,0,0));
+aviao.getWorldPosition(target);
+BBoxAviao.position.set(target.x, target.y, target.z);
+scene.add(BBoxAviao);
+*/
+
+
 
 //Função que move os planos
 function movePlanes(){
@@ -80,7 +97,7 @@ function movePlanes(){
     })
 }
 
-let target = new THREE.Vector3(0,0,0);
+
 
 //Função que cria os tiros
 function createAmmo(){
@@ -112,7 +129,7 @@ function deleteAmmo(){
 //Função que cria os inimigos
 function createEnemies(){
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
-    let positionX = (Math.random() * 90);
+    let positionX = (Math.random() * 185);
     let sinal = (Math.random()*2);
     let velocidade = (Math.random()*5);
     if(sinal >= 1)
@@ -136,6 +153,8 @@ function moveEnemies(){
 
 
 
+
+
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
 
@@ -144,11 +163,11 @@ window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)},
 render();
 function render()
 {
-    let x = Math.random()*100;
-    if(x >= 98.5)
-        createEnemies();
-    trackballControls.update();
-    moveEnemies();
+    //let x = Math.random()*100;
+    //if(x >= 98.5)
+    //    createEnemies();
+    //moveEnemies();
+    box.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
     keyboardUpdate();
     moveShoot();
     deleteAmmo();
