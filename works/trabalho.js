@@ -163,10 +163,10 @@ window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)},
 render();
 function render()
 {
-    //let x = Math.random()*100;
-    //if(x >= 98.5)
-    //    createEnemies();
-    //moveEnemies();
+    let x = Math.random()*100;
+    if(x >= 98.5)
+        createEnemies();
+    moveEnemies();
     box.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
     keyboardUpdate();
     moveShoot();
