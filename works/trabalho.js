@@ -38,7 +38,7 @@ function keyboardUpdate(){
     if(keyboard.pressed("down"))    aviao.translateY(-1.5);
     if(keyboard.pressed("left"))    aviao.translateX(-1);
     if(keyboard.pressed("right"))   aviao.translateX(1);
-    if(keyboard.down("space") | keyboard.pressed("ctrl"))       createAmmo();
+    if(keyboard.down("space") | keyboard.down("ctrl"))       createAmmo();
 
 }
 
@@ -71,7 +71,7 @@ function movePlanes(){
         item.translateY(-1);
         item.updateMatrixWorld(true);
         if(item.position.z == 400){
-            item.position.set(0, 0, -820);
+            item.position.set(0, 0, -800);
         }
     })
 }
@@ -96,12 +96,13 @@ function shoot(){
 function deleteAmmo(){
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
-        if(item.position.z + aviao.position.z == 150){
+        console.log(item.position.z + aviao.position.z);
+        if(item.position.z + aviao.position.z <= -150 | item.position.z + aviao.position.z >= 150){
             scene.remove(item);
         }
     })
 }
-//TODO
+//TODO: Função pra criar os inimigos
 /*
 function createEnemies(){
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));

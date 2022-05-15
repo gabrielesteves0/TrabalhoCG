@@ -14,7 +14,6 @@ var scene = new THREE.Scene();    // Create main scene
 var renderer = initRenderer();    // View function in util/utils
 var cameraHolder = new THREE.Object3D();
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-
 cameraHolder.position.set(0.0, 0.2, 0.0);
 scene.add(new THREE.HemisphereLight());
 scene.add(cameraHolder);
