@@ -53,6 +53,7 @@ scene.add( axesHelper );
 var ammo = [];
 var planes = [];
 var enemies = [];
+var velocidades = [];
 
 // Loop que cria os planos
 for(let i=0; i<3; i++){
@@ -113,17 +114,19 @@ function createEnemies(){
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
     let positionX = (Math.random() * 90);
     let sinal = (Math.random()*2);
+    let velocidade = (Math.random()*5);
     if(sinal >= 1)
         positionX = positionX * (-1);
     enemy.position.set(positionX, 10, -400);
     scene.add(enemy);
     enemies.push(enemy);
+    velocidades.push(velocidade);
 }
 
 //Função que move os inimigos
 function moveEnemies(){
     enemies.forEach(item => {
-        item.translateZ(1);
+        item.translateZ(velocidades.at(enemies.findIndex(element => element == item)));
         item.updateMatrixWorld(true);
         if(item.position.z >= 150){
             scene.remove(item);
