@@ -120,11 +120,16 @@ function moveShoot(){
 
 //Função que deleta os tiros
 function deleteAmmo(){
+    var index = 0;
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
         if(item.position.z + aviao.position.z <= -400 | item.position.z + aviao.position.z >= 400){
             scene.remove(item);
+            scene.remove(vectorAmmoBB.at(index));
+            ammo.splice(index, 1);
+            vectorAmmoBB.splice(index, 1);
         }
+        index++;
     })
 }
 
@@ -150,12 +155,17 @@ function createEnemies(){
 
 //Função que move os inimigos
 function moveEnemies(){
+    var index = 0;
     enemies.forEach(item => {
         item.translateZ(velocidades.at(enemies.findIndex(element => element == item)));
         item.updateMatrixWorld(true);
         if(item.position.z >= 150){
             scene.remove(item);
+            scene.remove(vectorEnemiesBB.at(index));
+            enemies.splice(index, 1);
+            vectorEnemiesBB.splice(index, 1);
         }
+        index++;
     })
 }
 
@@ -175,6 +185,9 @@ function animation(enemy){
     for(var i = 9; i > 0; i--)
         enemies.at(enemy).scale.set(i,i,i);
     scene.remove(enemies.at(enemy));
+    scene.remove(vectorEnemiesBB.at(enemy));
+    enemies.splice(enemy, 1);
+    vectorEnemiesBB.splice(enemy, 1);
 }
 
 function checkCollisions(){
@@ -192,6 +205,8 @@ function checkCollisions(){
                 console.log("toma");
                 scene.remove(ammo.at(contador));
                 scene.remove(item2);
+                ammo.splice(contador);
+                vectorAmmoBB.splice(contador);
                 animation(contador2);
             }
             contador++;                    
