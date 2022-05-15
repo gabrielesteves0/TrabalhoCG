@@ -24,8 +24,8 @@ initDefaultBasicLight(scene);
 
 var cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
-cameraHolder.translateY(40);
-cameraHolder.translateZ(100);
+cameraHolder.translateY(65);
+cameraHolder.translateZ(120);
 cameraHolder.translateX(5);
 cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
@@ -103,7 +103,7 @@ function moveShoot(){
 function deleteAmmo(){
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
-        if(item.position.z + aviao.position.z <= -150 | item.position.z + aviao.position.z >= 150){
+        if(item.position.z + aviao.position.z <= -400 | item.position.z + aviao.position.z >= 400){
             scene.remove(item);
         }
     })
@@ -117,7 +117,7 @@ function createEnemies(){
     let velocidade = (Math.random()*5);
     if(sinal >= 1)
         positionX = positionX * (-1);
-    enemy.position.set(positionX, 10, -400);
+    enemy.position.set(positionX, 10, -500);
     scene.add(enemy);
     enemies.push(enemy);
     velocidades.push(velocidade);
@@ -147,7 +147,7 @@ function render()
     let x = Math.random()*100;
     if(x >= 98.5)
         createEnemies();
-    //trackballControls.update();
+    trackballControls.update();
     moveEnemies();
     keyboardUpdate();
     moveShoot();
