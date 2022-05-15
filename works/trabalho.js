@@ -141,7 +141,7 @@ function createEnemies(){
 
     let positionX = (Math.random() * 185);
     let sinal = (Math.random()*2);
-    let velocidade = (Math.random()*5);
+    let velocidade = (Math.random()*4) + 1;
     if(sinal >= 1)
         positionX = positionX * (-1);
     enemy.position.set(positionX, 10, -500);
