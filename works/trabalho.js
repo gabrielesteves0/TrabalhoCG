@@ -54,8 +54,8 @@ var ammo = [];
 var planes = [];
 var enemies = [];
 var velocidades = [];
-
-const box = new THREE.Box3();
+var vectorEnemiesBB = [];
+var vectorAmmoBB = [];
 
 // Loop que cria os planos
 for(let i=0; i<3; i++){
@@ -73,9 +73,9 @@ scene.add(aviao);
 
 let target = new THREE.Vector3(0,0,0);
 
-aviao.geometry.computeBoundingBox();
-
-
+let aviaoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+aviaoBB.setFromObject(aviao);
+console.log(aviaoBB);
 
 /*
 let BBoxAviao = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 20), new THREE.MeshLambertMaterial(255,0,0));
@@ -83,8 +83,6 @@ aviao.getWorldPosition(target);
 BBoxAviao.position.set(target.x, target.y, target.z);
 scene.add(BBoxAviao);
 */
-
-
 
 //Função que move os planos
 function movePlanes(){
@@ -97,11 +95,15 @@ function movePlanes(){
     })
 }
 
-
-
 //Função que cria os tiros
 function createAmmo(){
     let shoot = new THREE.Mesh(new THREE.SphereGeometry(1, 0, 0), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    //Ammo Bounding Box
+    let ammoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+    ammoBB.setFromObject(shoot);
+    vectorAmmoBB.push(ammoBB);
+    console.log(ammoBB);
+
     aviao.getWorldPosition(target);
     shoot.position.set(target.x, target.y, target.z);
     scene.add(shoot);
@@ -129,6 +131,12 @@ function deleteAmmo(){
 //Função que cria os inimigos
 function createEnemies(){
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    //Enemies Bounding Box
+    let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+    enemiesBB.setFromObject(enemy);
+    vectorEnemiesBB.push(enemiesBB);
+    console.log(enemiesBB);
+
     let positionX = (Math.random() * 185);
     let sinal = (Math.random()*2);
     let velocidade = (Math.random()*5);
@@ -151,12 +159,49 @@ function moveEnemies(){
     })
 }
 
+function atualizaBB(){
+    aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
+    enemies.forEach(item => {
+        vectorEnemiesBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+    })
 
+    ammo.forEach(item => {
+        vectorAmmoBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+    })
+}
 
+function animation(enemy){
+    for(var i = 9; i > 0; i--)
+        enemies.at(enemy).scale.set(i,i,i);
+    scene.remove(enemies.at(enemy));
+}
+
+function checkCollisions(){
+    let contador2 = 0;
+    vectorEnemiesBB.forEach(item => {        
+        if(item.intersectsBox(aviaoBB)){
+            console.log("bateu");
+            
+        }    
+
+        let contador = 0;
+        
+        vectorAmmoBB.forEach(item2 =>{
+            if(item.intersectsBox(item2)){
+                console.log("toma");
+                scene.remove(ammo.at(contador));
+                scene.remove(item2);
+                animation(contador2);
+            }
+            contador++;                    
+        })        
+        contador2++;
+    })        
+    
+}
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
-
 
 window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)}, false );
 
@@ -166,8 +211,9 @@ function render()
     let x = Math.random()*100;
     if(x >= 98.5)
         createEnemies();
-    moveEnemies();
-    box.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
+    moveEnemies();   
+    atualizaBB();
+    checkCollisions();
     keyboardUpdate();
     moveShoot();
     deleteAmmo();
