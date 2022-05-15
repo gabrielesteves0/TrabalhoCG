@@ -120,16 +120,13 @@ function moveShoot(){
 
 //Função que deleta os tiros
 function deleteAmmo(){
-    var index = 0;
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
-        if(item.position.z + aviao.position.z <= -400 | item.position.z + aviao.position.z >= 400){
+        if((item.position.z + aviao.position.z <= -400 || item.position.z + aviao.position.z >= 400) && item != null && !('consumed' in item.userData)){
             scene.remove(item);
-            scene.remove(vectorAmmoBB.at(index));
-            ammo.splice(index, 1);
-            vectorAmmoBB.splice(index, 1);
+            item.userData.consumed = true;
+            item = null;
         }
-        index++;
     })
 }
 
@@ -155,17 +152,14 @@ function createEnemies(){
 
 //Função que move os inimigos
 function moveEnemies(){
-    var index = 0;
     enemies.forEach(item => {
         item.translateZ(velocidades.at(enemies.findIndex(element => element == item)));
         item.updateMatrixWorld(true);
-        if(item.position.z >= 150){
+        if(item.position.z >= 150 && item != null && !('consumed' in item.userData)){
             scene.remove(item);
-            scene.remove(vectorEnemiesBB.at(index));
-            enemies.splice(index, 1);
-            vectorEnemiesBB.splice(index, 1);
+            item.userData.consumed = true;
+            item = null;
         }
-        index++;
     })
 }
 
@@ -173,21 +167,19 @@ function atualizaBB(){
     aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
     enemies.forEach(item => {
-        vectorEnemiesBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+        if(item != null && !('consumed' in item.userData))
+            vectorEnemiesBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
     })
 
     ammo.forEach(item => {
-        vectorAmmoBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+        if(item != null && !('consumed' in item.userData))
+            vectorAmmoBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
     })
 }
 
 function animation(enemy){
-    for(var i = 9; i > 0; i--)
-        enemies.at(enemy).scale.set(i,i,i);
-    scene.remove(enemies.at(enemy));
-    scene.remove(vectorEnemiesBB.at(enemy));
-    enemies.splice(enemy, 1);
-    vectorEnemiesBB.splice(enemy, 1);
+    enemies.at(enemy).material.color = new THREE.Color(255,0,0);
+    
 }
 
 function checkCollisions(){
@@ -201,13 +193,19 @@ function checkCollisions(){
         let contador = 0;
         
         vectorAmmoBB.forEach(item2 =>{
-            if(item.intersectsBox(item2)){
+            if(item != null && item2 != null && item.intersectsBox(item2) && !('consumed' in enemies.at(contador2).userData) && ammo.at(contador) != null && !('consumed' in ammo.at(contador).userData)){
                 console.log("toma");
                 scene.remove(ammo.at(contador));
-                scene.remove(item2);
-                ammo.splice(contador);
-                vectorAmmoBB.splice(contador);
+                ammo.at(contador).userData.consumed = true;
+                item = null;
                 animation(contador2);
+                //scene.remove(enemies.at(contador2));
+                //enemies.at(contador2).userData.consumed = true;
+                //var contador3 = 0;
+                //vectorEnemiesBB.forEach(item3 => {
+                //    if(contador3 == contador2)
+                //        item3 = null;
+                //})
             }
             contador++;                    
         })        
