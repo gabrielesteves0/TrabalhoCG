@@ -9,7 +9,7 @@ import {initRenderer,
         createGroundPlaneXZ,
         createGroundPlaneWired,
         degreesToRadians} from "../libs/util/util.js";
-import { ConeBufferGeometry } from '../build/three.module.js';
+import { AnimationClip, AnimationMixer, ConeBufferGeometry, NumberKeyframeTrack } from '../build/three.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 
 var scene = new THREE.Scene();    // Create main scene
@@ -57,6 +57,7 @@ var enemies = [];
 var velocidades = [];
 var vectorEnemiesBB = [];
 var vectorAmmoBB = [];
+//var killedEnemies = [];
 
 // Loop que cria os planos
 for(let i=0; i<3; i++){
@@ -94,6 +95,7 @@ function movePlanes(){
         }
     })
 }
+
 
 //Função que cria os tiros
 function createAmmo(){
@@ -190,6 +192,13 @@ function atualizaBB(){
     })
 }
 
+// const times = [0, 1, 2, 3];
+// const values = [9, 5, 3, 1];
+
+// const scaleKF = new NumberKeyframeTrack('.scale.set', times, values);
+// frames = [scaleKF];
+
+const killClip = new AnimationClip('kill', -1, frames);
 
 function checkCollisions(){
     vectorEnemiesBB.forEach(item => {
@@ -197,6 +206,11 @@ function checkCollisions(){
             if(box.intersectsBox(item) || box.containsBox(item)){
                 var indexEnemy = vectorEnemiesBB.indexOf(item);
                 var indexBullet = vectorAmmoBB.indexOf(box);
+                //var enemyCopy = enemies[indexEnemy];
+                //scene.add(enemyCopy);
+                //var mixer = new AnimationMixer(enemyCopy);
+                //var action = mixer.clipAction(killClip);
+                //action.play();
                 scene.remove(box);
                 scene.remove(item);
                 scene.remove(ammo[indexBullet]);
@@ -206,6 +220,7 @@ function checkCollisions(){
                 enemies.splice(indexEnemy, 1);
                 vectorEnemiesBB.splice(indexEnemy, 1);
                 velocidades.splice(indexEnemy, 1);
+                //scene.remove(enemyCopy);
             }
         })
         if(item.intersectsBox(aviaoBB) || item.containsBox(aviaoBB)){
@@ -213,6 +228,7 @@ function checkCollisions(){
         }
     })
 }
+
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
@@ -222,9 +238,9 @@ render();
 function render()
 {
     let x = Math.random()*100;
-    if(x >= 97)
+    if(x >= 95)
         createEnemies();
-    moveEnemies();   
+    moveEnemies();
     atualizaBB();
     checkCollisions();
     keyboardUpdate();
