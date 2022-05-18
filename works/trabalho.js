@@ -36,10 +36,11 @@ var keyboard = new KeyboardState();
 
 function keyboardUpdate(){
     keyboard.update();
-    if(keyboard.pressed("up"))  aviao.translateY(1.5);
-    if(keyboard.pressed("down"))    aviao.translateY(-1.5);
-    if(keyboard.pressed("left"))    aviao.translateX(-1);
-    if(keyboard.pressed("right"))   aviao.translateX(1);
+
+    if(keyboard.pressed("up") && aviao.position.z >= -400)  aviao.translateY(1.5);
+    if(keyboard.pressed("down") && aviao.position.z <= 70) aviao.translateY(-1.5);
+    if(keyboard.pressed("left") && aviao.position.x >= -180)    aviao.translateX(-1);
+    if(keyboard.pressed("right") && aviao.position.x <= 180)   aviao.translateX(1);
     if(keyboard.down("space") | keyboard.down("ctrl"))       createAmmo();
 
 }
@@ -75,7 +76,6 @@ let target = new THREE.Vector3(0,0,0);
 
 let aviaoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 aviaoBB.setFromObject(aviao);
-console.log(aviaoBB);
 
 /*
 let BBoxAviao = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 20), new THREE.MeshLambertMaterial(255,0,0));
@@ -102,7 +102,9 @@ function createAmmo(){
     let ammoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     ammoBB.setFromObject(shoot);
     vectorAmmoBB.push(ammoBB);
-    console.log(ammoBB);
+    //let helper = new THREE.Box3Helper( ammoBB, 0xffff00 );
+    //scene.add( helper );
+
 
     aviao.getWorldPosition(target);
     shoot.position.set(target.x, target.y, target.z);
@@ -122,10 +124,14 @@ function moveShoot(){
 function deleteAmmo(){
     ammo.forEach(item => {
         item.updateMatrixWorld(true);
-        if((item.position.z + aviao.position.z <= -400 || item.position.z + aviao.position.z >= 400) && item != null && !('consumed' in item.userData)){
+        if(item.position.z <= -400){
+            var indexBullet = ammo.indexOf(item);
             scene.remove(item);
-            item.userData.consumed = true;
-            item = null;
+            scene.remove(vectorAmmoBB[indexBullet]);
+            ammo.splice(indexBullet, 1);
+            vectorAmmoBB.splice(indexBullet, 1);
+            //item.userData.consumed = true;
+            //item = null;
         }
     })
 }
@@ -137,7 +143,9 @@ function createEnemies(){
     let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     enemiesBB.setFromObject(enemy);
     vectorEnemiesBB.push(enemiesBB);
-    console.log(enemiesBB);
+
+    //let helper = new THREE.Box3Helper( enemiesBB, 0xffff00 );
+    //scene.add( helper );
 
     let positionX = (Math.random() * 185);
     let sinal = (Math.random()*2);
@@ -153,12 +161,17 @@ function createEnemies(){
 //Função que move os inimigos
 function moveEnemies(){
     enemies.forEach(item => {
-        item.translateZ(velocidades.at(enemies.findIndex(element => element == item)));
+        item.translateZ(velocidades[enemies.indexOf(item)]);
         item.updateMatrixWorld(true);
-        if(item.position.z >= 150 && item != null && !('consumed' in item.userData)){
+        if(item.position.z >= 150 /* && item != null && !('consumed' in item.userData)*/){
+            var indexEnemy = enemies.indexOf(item);
             scene.remove(item);
-            item.userData.consumed = true;
-            item = null;
+            scene.remove(vectorEnemiesBB[indexEnemy]);
+            enemies.splice(indexEnemy, 1);
+            vectorEnemiesBB.splice(indexEnemy, 1);
+            velocidades.splice(indexEnemy, 1);
+            //item.userData.consumed = true;
+            //item = null;
         }
     })
 }
@@ -166,52 +179,39 @@ function moveEnemies(){
 function atualizaBB(){
     aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
-    enemies.forEach(item => {
-        if(item != null && !('consumed' in item.userData))
-            vectorEnemiesBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+    enemies.forEach(inimigo => {
+        //if(item != null && !('consumed' in item.userData))
+        vectorEnemiesBB.at(enemies.indexOf(inimigo)).copy(inimigo.geometry.boundingBox).applyMatrix4(inimigo.matrixWorld);
     })
 
-    ammo.forEach(item => {
-        if(item != null && !('consumed' in item.userData))
-            vectorAmmoBB.at(enemies.findIndex(element => element == item)).copy(item.geometry.boundingBox).applyMatrix4(item.matrixWorld);
+    ammo.forEach(tiro => {
+        //if(item != null && !('consumed' in item.userData))
+        vectorAmmoBB.at(ammo.indexOf(tiro)).copy(tiro.geometry.boundingBox).applyMatrix4(tiro.matrixWorld);
     })
 }
 
-function animation(enemy){
-    enemies.at(enemy).material.color = new THREE.Color(255,0,0);
-    
-}
 
 function checkCollisions(){
-    let contador2 = 0;
-    vectorEnemiesBB.forEach(item => {        
-        if(item.intersectsBox(aviaoBB)){
-            console.log("bateu");
-            
-        }    
-
-        let contador = 0;
-        
-        vectorAmmoBB.forEach(item2 =>{
-            if(item != null && item2 != null && item.intersectsBox(item2) && !('consumed' in enemies.at(contador2).userData) && ammo.at(contador) != null && !('consumed' in ammo.at(contador).userData)){
-                console.log("toma");
-                scene.remove(ammo.at(contador));
-                ammo.at(contador).userData.consumed = true;
-                item = null;
-                animation(contador2);
-                //scene.remove(enemies.at(contador2));
-                //enemies.at(contador2).userData.consumed = true;
-                //var contador3 = 0;
-                //vectorEnemiesBB.forEach(item3 => {
-                //    if(contador3 == contador2)
-                //        item3 = null;
-                //})
+    vectorEnemiesBB.forEach(item => {
+        vectorAmmoBB.forEach(box => {
+            if(box.intersectsBox(item) || box.containsBox(item)){
+                var indexEnemy = vectorEnemiesBB.indexOf(item);
+                var indexBullet = vectorAmmoBB.indexOf(box);
+                scene.remove(box);
+                scene.remove(item);
+                scene.remove(ammo[indexBullet]);
+                scene.remove(enemies[indexEnemy]);
+                ammo.splice(indexBullet, 1);
+                vectorAmmoBB.splice(indexBullet, 1);
+                enemies.splice(indexEnemy, 1);
+                vectorEnemiesBB.splice(indexEnemy, 1);
+                velocidades.splice(indexEnemy, 1);
             }
-            contador++;                    
-        })        
-        contador2++;
-    })        
-    
+        })
+        if(item.intersectsBox(aviaoBB) || item.containsBox(aviaoBB)){
+            aviao.position.set(0,10,0);
+        }
+    })
 }
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
@@ -222,7 +222,7 @@ render();
 function render()
 {
     let x = Math.random()*100;
-    if(x >= 98.5)
+    if(x >= 97)
         createEnemies();
     moveEnemies();   
     atualizaBB();
