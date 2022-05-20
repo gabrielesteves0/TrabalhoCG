@@ -9,12 +9,11 @@ import {initRenderer,
         createGroundPlaneXZ,
         createGroundPlaneWired,
         degreesToRadians} from "../libs/util/util.js";
-import { AnimationClip, AnimationMixer, ConeBufferGeometry, NumberKeyframeTrack } from '../build/three.module.js';
+import { AnimationClip, AnimationMixer, Color, ConeBufferGeometry, NumberKeyframeTrack } from '../build/three.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = initRenderer();    // View function in util/utils
-//var camera = initCamera(new THREE.Vector3(0, 45, 90));
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.lookAt(0, 0, 0);
   camera.position.set(3.6, 4.6, 8.2);
@@ -57,7 +56,7 @@ var enemies = [];
 var velocidades = [];
 var vectorEnemiesBB = [];
 var vectorAmmoBB = [];
-//var killedEnemies = [];
+var killedEnemies = [];
 
 // Loop que cria os planos
 for(let i=0; i<3; i++){
@@ -72,18 +71,13 @@ let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshLa
 aviao.rotateX(degreesToRadians(-90));
 aviao.translateZ(10);
 scene.add(aviao);
+let auxAnimationAviao = false;
 
 let target = new THREE.Vector3(0,0,0);
 
 let aviaoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 aviaoBB.setFromObject(aviao);
 
-/*
-let BBoxAviao = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 20), new THREE.MeshLambertMaterial(255,0,0));
-aviao.getWorldPosition(target);
-BBoxAviao.position.set(target.x, target.y, target.z);
-scene.add(BBoxAviao);
-*/
 
 //Função que move os planos
 function movePlanes(){
@@ -192,25 +186,17 @@ function atualizaBB(){
     })
 }
 
-// const times = [0, 1, 2, 3];
-// const values = [9, 5, 3, 1];
 
-// const scaleKF = new NumberKeyframeTrack('.scale.set', times, values);
-// frames = [scaleKF];
-
-const killClip = new AnimationClip('kill', -1, frames);
 
 function checkCollisions(){
+    var aux = new THREE.Mesh();
     vectorEnemiesBB.forEach(item => {
         vectorAmmoBB.forEach(box => {
             if(box.intersectsBox(item) || box.containsBox(item)){
                 var indexEnemy = vectorEnemiesBB.indexOf(item);
                 var indexBullet = vectorAmmoBB.indexOf(box);
-                //var enemyCopy = enemies[indexEnemy];
-                //scene.add(enemyCopy);
-                //var mixer = new AnimationMixer(enemyCopy);
-                //var action = mixer.clipAction(killClip);
-                //action.play();
+                let enemyCopy = aux.copy(enemies[indexEnemy]);
+                killedEnemies.push(enemyCopy);
                 scene.remove(box);
                 scene.remove(item);
                 scene.remove(ammo[indexBullet]);
@@ -220,13 +206,47 @@ function checkCollisions(){
                 enemies.splice(indexEnemy, 1);
                 vectorEnemiesBB.splice(indexEnemy, 1);
                 velocidades.splice(indexEnemy, 1);
-                //scene.remove(enemyCopy);
             }
         })
         if(item.intersectsBox(aviaoBB) || item.containsBox(aviaoBB)){
-            aviao.position.set(0,10,0);
+            auxAnimationAviao = true;
         }
     })
+}
+
+function animationEnemy()
+{
+    var contador = 0;
+    killedEnemies.forEach(item => {
+        scene.add(item);
+        item.scale.x = item.scale.x - 0.1;
+        item.scale.y = item.scale.y - 0.1;
+        item.scale.z = item.scale.z - 0.1;
+        if(item.scale.x <= 0){
+            scene.remove(item);
+            killedEnemies.splice(contador, 1);
+        }
+        contador++;
+    })
+}
+
+
+function animationAviao(){
+    if(auxAnimationAviao){
+        aviao.scale.x = aviao.scale.x - 0.05;
+        aviao.scale.y = aviao.scale.y - 0.05;
+        aviao.scale.z = aviao.scale.z - 0.05;
+        aviao.material.color.setHex(0xff0000);
+        if(aviao.scale.x <= 0){
+            aviao.position.set(0,10,0);
+            auxAnimationAviao = false;
+            aviao.scale.x = 1;
+            aviao.scale.y = 1;
+            aviao.scale.z = 1;
+            aviao.material.color.setHex(0xffffff);
+        }
+    }
+
 }
 
 
@@ -244,6 +264,8 @@ function render()
     atualizaBB();
     checkCollisions();
     keyboardUpdate();
+    animationEnemy();
+    animationAviao();
     moveShoot();
     deleteAmmo();
     movePlanes();
