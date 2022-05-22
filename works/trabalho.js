@@ -14,17 +14,17 @@ import KeyboardState from '../libs/util/KeyboardState.js';
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = initRenderer();    // View function in util/utils
-var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.lookAt(0, 0, 0);
-  camera.position.set(3.6, 4.6, 8.2);
+  camera.position.set(3.6, 100, 8.2);
   camera.up.set( 0, 1, 0 );
 initDefaultBasicLight(scene);
 
 
 var cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
-cameraHolder.translateY(65);
-cameraHolder.translateZ(120);
+cameraHolder.translateY(100);
+cameraHolder.translateZ(200);
 cameraHolder.translateX(5);
 cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
@@ -36,10 +36,10 @@ var keyboard = new KeyboardState();
 function keyboardUpdate(){
     keyboard.update();
 
-    if(keyboard.pressed("up") && aviao.position.z >= -400)  aviao.translateY(1.5);
-    if(keyboard.pressed("down") && aviao.position.z <= 70) aviao.translateY(-1.5);
-    if(keyboard.pressed("left") && aviao.position.x >= -180)    aviao.translateX(-1);
-    if(keyboard.pressed("right") && aviao.position.x <= 180)   aviao.translateX(1);
+    if(keyboard.pressed("up") && aviao.position.z >= -345)  aviao.translateY(2);
+    if(keyboard.pressed("down") && aviao.position.z <= 120) aviao.translateY(-2);
+    if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
+    if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
     if(keyboard.down("space") | keyboard.down("ctrl"))       createAmmo();
 
 }
@@ -111,7 +111,7 @@ function createAmmo(){
 //Função que move os tiros
 function moveShoot(){
     ammo.forEach(item => {
-        item.translateZ(-1);
+        item.translateZ(-5);
     });
 
 }
@@ -145,7 +145,7 @@ function createEnemies(){
 
     let positionX = (Math.random() * 185);
     let sinal = (Math.random()*2);
-    let velocidade = (Math.random()*4) + 1;
+    let velocidade = (Math.random()*5) + 3;
     if(sinal >= 1)
         positionX = positionX * (-1);
     enemy.position.set(positionX, 10, -500);
