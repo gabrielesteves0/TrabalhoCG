@@ -1,3 +1,7 @@
+//Nomes:
+//Gabriel Antônio Esteves Matta
+//Ticiano de Oliveira Fracette
+
 import * as THREE from  'three';
 import Stats from       '../build/jsm/libs/stats.module.js';
 import {TrackballControls} from '../build/jsm/controls/TrackballControls.js';
