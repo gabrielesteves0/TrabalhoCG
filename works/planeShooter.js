@@ -122,7 +122,7 @@ function createAmmo(){
 
 //Função que cria os inimigos
 function createEnemies(){
-    //Modelagem dos tiros:
+    //Modelagem dos inimigos:
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
     //Criação das Box3 (bounding boxes) dos inimigos:
     let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
@@ -245,11 +245,11 @@ function atualizaBB(){
 
     enemies.forEach(inimigo => {
         vectorEnemiesBB.at(enemies.indexOf(inimigo)).copy(inimigo.geometry.boundingBox).applyMatrix4(inimigo.matrixWorld);
-    })
+    });
 
     ammo.forEach(tiro => {
         vectorAmmoBB.at(ammo.indexOf(tiro)).copy(tiro.geometry.boundingBox).applyMatrix4(tiro.matrixWorld);
-    })
+    });
 }
 
 
