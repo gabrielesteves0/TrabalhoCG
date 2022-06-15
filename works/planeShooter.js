@@ -41,7 +41,8 @@ scene.add(cameraHolder);
 
 
 //Criação da luz direcional
-var lightPosition = new THREE.Vector3(0, 18, 20);
+var lightPosition = new THREE.Vector3(0, 40, 20);
+cameraHolder.getWorldPosition(lightPosition);
 var lightColor = "rgb(255,255,255)";
 var ambientColor = "rgb(50,50,50)";
 
@@ -67,11 +68,11 @@ function setDirectionalLighting(position)
   dirLight.castShadow = true;
 
   dirLight.shadow.camera.near = .1;
-  dirLight.shadow.camera.far = 20;
-  dirLight.shadow.camera.left = -2.5;
-  dirLight.shadow.camera.right = 2.5;
-  dirLight.shadow.camera.top = 2.5;
-  dirLight.shadow.camera.bottom = -2.5;
+  dirLight.shadow.camera.far = 500;
+  dirLight.shadow.camera.left = -200;
+  dirLight.shadow.camera.right = 200;
+  dirLight.shadow.camera.top = 50;
+  dirLight.shadow.camera.bottom = -200;
 
   scene.add(dirLight);
 }
@@ -360,6 +361,5 @@ function render()
     deleteAmmo();
     movePlanes();
     requestAnimationFrame(render);
-    trackballControls.update();
     renderer.render(scene, camera) // Render scene
 }

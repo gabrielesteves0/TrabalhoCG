@@ -26,7 +26,6 @@ var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHei
 
 
 
-var lightIntensity = 1.0;
 var lightPosition = new THREE.Vector3(3, 0.8, 5.0);
 var lightColor = "rgb(255,255,255)";
 var ambientColor = "rgb(50,50,50)";
