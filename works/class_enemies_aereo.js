@@ -1,4 +1,6 @@
-export class EnemiesAereo extends Enemies {
+import * as THREE from 'three';
+
+export default class EnemiesAereo extends Enemies {
     constructor(movimento/*, modeloInimigo*/){
         super(/*modeloInimigo*/);
         if(movimento == "diagonalEsquerda"){

@@ -1,5 +1,6 @@
+import * as THREE from 'three';
 
-export class Enemies {
+export default class Enemies {
     //Private
     _velocidadeX;
     _velocidadeZ;

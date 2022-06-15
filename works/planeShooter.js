@@ -12,8 +12,8 @@ import {initRenderer,
         degreesToRadians,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
-import Enemies from '../works/class_enemies.js';
-import Ammo from '../works/class_ammo.js';
+import {default as Enemies} from '../works/class_enemies.js';
+import {default as Ammo} from '../works/class_ammo.js';
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils

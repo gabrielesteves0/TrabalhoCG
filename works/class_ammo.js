@@ -1,4 +1,6 @@
-export class Ammo {
+import * as THREE from 'three';
+
+export default class Ammo {
     shoot;
     ammoBB;
     #velocidadeZ;
