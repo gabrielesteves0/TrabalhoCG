@@ -9,11 +9,17 @@ import {initRenderer,
         initDefaultBasicLight,
         onWindowResize,
         createGroundPlaneWired,
-        degreesToRadians} from "../libs/util/util.js";
+        degreesToRadians,
+        createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
 
 var scene = new THREE.Scene();    // Create main scene
-var renderer = initRenderer();    // View function in util/utils
+var renderer = new THREE.WebGLRenderer();    // View function in util/utils
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.type = THREE.VSMShadowMap;
+    document.getElementById("webgl-output").appendChild(renderer.domElement);
 
 
 //                                  MOVIMENTAÇÃO E CÂMERA:
@@ -23,7 +29,7 @@ var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHei
   camera.lookAt(0, 0, 0);
   camera.position.set(3.6, 100, 8.2);
   camera.up.set( 0, 1, 0 );
-initDefaultBasicLight(scene);
+//initDefaultBasicLight(scene);
 //Criação do CameraHolder, e posicionamento no mundo:
 var cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
@@ -32,6 +38,44 @@ cameraHolder.translateZ(200);
 cameraHolder.translateX(5);
 cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
+
+
+//Criação da luz direcional
+var lightPosition = new THREE.Vector3(0, 18, 20);
+var lightColor = "rgb(255,255,255)";
+var ambientColor = "rgb(50,50,50)";
+
+var lightHolder = new THREE.Object3D();
+scene.add(lightHolder);
+
+
+var lightSphere = createLightSphere(lightHolder, 5, 10, 10, lightPosition);
+scene.add(lightSphere);
+
+var ambientLight = new THREE.AmbientLight(ambientColor);
+scene.add( ambientLight );
+
+var dirLight = new THREE.DirectionalLight(lightColor);
+setDirectionalLighting(lightPosition);
+
+
+function setDirectionalLighting(position)
+{
+  dirLight.position.copy(position);
+  dirLight.shadow.mapSize.width = 256;
+  dirLight.shadow.mapSize.height = 256;
+  dirLight.castShadow = true;
+
+  dirLight.shadow.camera.near = .1;
+  dirLight.shadow.camera.far = 20;
+  dirLight.shadow.camera.left = -2.5;
+  dirLight.shadow.camera.right = 2.5;
+  dirLight.shadow.camera.top = 2.5;
+  dirLight.shadow.camera.bottom = -2.5;
+
+  scene.add(dirLight);
+}
+
 
 //Função KeyboardUpdate, para movimentação do avião:
 var keyboard = new KeyboardState();
@@ -72,6 +116,7 @@ for(let i=0; i<3; i++){
     let plane = createGroundPlaneWired(400, 400);
     scene.add(plane);
     plane.position.set(0,0,-(400*i));
+    plane.receiveShadow = true;
     planes.push(plane);
 }
 
@@ -90,10 +135,11 @@ function movePlanes(){
 //                                  MODELAGEM E DINÂMICA:
 
 //Modelagem do avião:
-let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshLambertMaterial(255,0,0));
+let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
 aviao.rotateX(degreesToRadians(-90));
 aviao.translateZ(10);
 scene.add(aviao);
+aviao.castShadow = true;
 //Variável booleana para auxiliar na animação quando o avião colide com algum inimigo. Caso ela seja 'false', o avião não colidiu. Se estiver 'true',
 //significa que o avião colidiu com algum inimigo, então a função que executa sua animação atua.
 let auxAnimationAviao = false;
@@ -123,7 +169,8 @@ function createAmmo(){
 //Função que cria os inimigos
 function createEnemies(){
     //Modelagem dos inimigos:
-    let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshPhongMaterial({color:"rgb(255,0,0)", shininess:200} ));
+    enemy.castShadow = true;
     //Criação das Box3 (bounding boxes) dos inimigos:
     let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     enemiesBB.setFromObject(enemy);
@@ -313,5 +360,6 @@ function render()
     deleteAmmo();
     movePlanes();
     requestAnimationFrame(render);
+    trackballControls.update();
     renderer.render(scene, camera) // Render scene
 }
