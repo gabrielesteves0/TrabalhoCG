@@ -14,6 +14,9 @@ import {initRenderer,
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {default as Enemies} from '../works/class_enemies.js';
 import {default as Ammo} from '../works/class_ammo.js';
+import {default as EnemiesAereo} from '../works/class_enemies_aereo.js';
+
+export {scene};
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils
@@ -22,7 +25,6 @@ var renderer = new THREE.WebGLRenderer();    // View function in util/utils
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.type = THREE.VSMShadowMap;
     document.getElementById("webgl-output").appendChild(renderer.domElement);
-
 
 //                                  MOVIMENTAÇÃO E CÂMERA:
 

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import {scene} from '../works/planeShooter.js';
 
 export default class Enemies {
-    //Private
+    //Protected
     _velocidadeX;
     _velocidadeZ;
     _positionX;
@@ -14,10 +15,10 @@ export default class Enemies {
     enemyBB;
     enemy;
     constructor(/*modeloInimigo*/){
-        let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshPhongMaterial({color:"rgb(255,0,0)", shininess:200} ));
-        enemy.castShadow = true;
-        enemyBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-        enemyBB.setFromObject(enemy);
+        this.enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshPhongMaterial({color:"rgb(255,0,0)", shininess:200} ));
+        this.enemy.castShadow = true;
+        this.enemyBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        this.enemyBB.setFromObject(this.enemy);
         //modelo = modeloInimigo;
         this._positionX = (Math.random() * 185);
         this._positionY = 10;
@@ -26,14 +27,14 @@ export default class Enemies {
         this._velocidadeZ = (Math.random()*5) + 3;
         let sinal = Math.random()*2;
         if(sinal >= 1)
-            this._positionX = positionX * (-1);
-        enemy.position.set(this._positionX, this._positionY, this._positionZ);
-        scene.add(enemy);
-        vector.push(enemy);
+            this._positionX = this._positionX * (-1);
+        this.enemy.position.set(this._positionX, this._positionY, this._positionZ);
+        scene.add(this.enemy);
+        Enemies.vector.push(this.enemy);
     }
     
     static moveEnemies() {
-        vector.forEach(item => {
+        Enemies.vector.forEach(item => {
             item.enemy.translateZ(item._velocidadeZ);
             item.enemy.translateX(item._velocidadeX);
             item.enemy.updateMatrixWorld(true);
@@ -47,11 +48,9 @@ export default class Enemies {
     }
 
     static atualizaBB() {
-        vector.forEach(inimigo => {
+        Enemies.vector.forEach(inimigo => {
             inimigo.enemyBB.copy(inimigo.enemy.geometry.boundingBox).applyMatrix4(inimigo.enemy.matrixWorld);
         });
     }
 
 }
-
-

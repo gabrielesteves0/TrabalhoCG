@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {scene} from '../works/planeShooter.js';
 
 export default class Ammo {
     shoot;
@@ -25,7 +26,7 @@ export default class Ammo {
 
     //Função que move os tiros
     static moveShoot() {
-        vector.forEach(item => {
+        Ammo.vector.forEach(item => {
             item.shoot.translateZ(item.#velocidadeZ);
             item.shoot.translateY(item.#velocidadeY);
         });
@@ -34,7 +35,7 @@ export default class Ammo {
     //Função que deleta os tiros
     static deleteAmmo(){
         //Percorre o vetor de tiros:
-        vector.forEach(item => {
+        Ammo.vector.forEach(item => {
             //Atualiza a posição no mundo do tiro:
             item.shoot.updateMatrixWorld(true);
             //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
@@ -48,7 +49,7 @@ export default class Ammo {
 }
 
     static atualizaBB() {
-        vector.forEach(tiro => {
+        Ammo.vector.forEach(tiro => {
             tiro.ammoBB.copy(tiro.shoot.geometry.boundingBox).applyMatrix4(tiro.shoot.matrixWorld);
         });
     }

@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+import {scene} from '../works/planeShooter.js';
+import {default as Enemies} from '../works/class_enemies.js';
 
 export default class EnemiesAereo extends Enemies {
     constructor(movimento/*, modeloInimigo*/){
