@@ -14,9 +14,8 @@ import {initRenderer,
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {default as Enemies} from '../works/class_enemies.js';
 import {default as Ammo} from '../works/class_ammo.js';
-import {default as EnemiesAereo} from '../works/class_enemies_aereo.js';
 
-export {scene};
+// export {scene};
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils
@@ -102,13 +101,15 @@ scene.add( axesHelper );
 
 //Vetores para auxiliar no controle das munições, planos, inimigos e bounding boxes:
 // //Vetor para armazenar os tiros:
-var ammo = [];
+var vetorTiros = [];
 //Vetor para armazenar os planos:
 var planes = [];
 // //Vetor para armazenar os inimigos:
-var enemies = [];
+var vetorInimigos = [];
 // //Vetor para armazenar as velocidades de cada inimigo:
-var velocidades = [];
+var velInimigos = [];
+
+var velTiros = [];
 // //Vetor para armazenar as Box3 dos inimigos:
 var vectorEnemiesBB = [];
 // //Vetor para armazenar as Box3 dos tiros:
@@ -159,39 +160,37 @@ aviaoBB.setFromObject(aviao);
 //Função que cria os tiros:
 function createAmmo(){
     //Modelagem dos tiros:
+    aviao.getWorldPosition(target);
+    let aux = new Ammo("ar-ar");
     let shoot = new THREE.Mesh(new THREE.SphereGeometry(1, 0, 0), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    shoot.position.set(target.x, target.y, target.z);
     //Criação das Box3 (bounding boxes) dos tiros:
     let ammoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     ammoBB.setFromObject(shoot);
-    vectorAmmoBB.push(ammoBB);
+    scene.add(ammoBB);
     //Aqui, colocamos as coordenadas do avião no vetor target (criado anteriormente), e então, a partir dele, definimos a posição inicial do tiro.
-    aviao.getWorldPosition(target);
-    shoot.position.set(target.x, target.y, target.z);
     scene.add(shoot);
-    ammo.push(shoot);
+    vetorTiros.push(shoot);
+    velTiros.push(aux);
+    vectorAmmoBB.push(ammoBB);
 }
 
 //Função que cria os inimigos
 function createEnemies(){
     //Modelagem dos tiros:
     let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
+    enemy.castShadow = true;
     //Criação das Box3 (bounding boxes) dos inimigos:
     let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     enemiesBB.setFromObject(enemy);
-    vectorEnemiesBB.push(enemiesBB);
-    //Aqui, utilizamos a função Math.random() para gerar um valor aleatório entre 0 e 185, que será a coordenada em X do inimigo:
-    let positionX = (Math.random() * 185);
-    //Esta variável serve para trocar aleatoriamente o sinal da posição X do inimigo, para que os mesmos apareçam por todo o plano.
-    let sinal = (Math.random()*2);
-    //Gerando o valor da velocidade do inimigo aleatoriamente:
-    let velocidade = (Math.random()*5) + 3;
-    //Troca de sinal:
-    if(sinal >= 1)
-        positionX = positionX * (-1);
-    enemy.position.set(positionX, 10, -500);
+    scene.add(enemiesBB);
+    //Criação das Box3 (bounding boxes) dos inimigos:
+    let aux = new Enemies("terrestre");
+    enemy.position.set(aux.getPositionX(), aux.getPositionY(), aux.getPositionZ());
     scene.add(enemy);
-    enemies.push(enemy);
-    velocidades.push(velocidade);
+    vetorInimigos.push(enemy);
+    vectorEnemiesBB.push(enemiesBB);
+    velInimigos.push(aux);
 }
 
 
@@ -245,8 +244,11 @@ function animationAviao(){
 
 //Função que move os tiros
 function moveShoot(){
-    ammo.forEach(item => {
-        item.translateZ(-5);
+    vetorTiros.forEach(item => {
+        // item.translateX(velTiros.at(ammo.indexOf(item)).getVelocidadeX);
+        // item.translateY(velTiros.at(ammo.indexOf(item)).getVelocidadeY);
+        item.translateZ(velTiros.at(vetorTiros.indexOf(item)).getVelocidadeZ);
+        
     });
 
 }
@@ -254,16 +256,17 @@ function moveShoot(){
 //Função que deleta os tiros
 function deleteAmmo(){
     //Percorre o vetor de tiros:
-    ammo.forEach(item => {
+    vetorTiros.forEach(item => {
         //Atualiza a posição no mundo do tiro:
         item.updateMatrixWorld(true);
         //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
         if(item.position.z <= -400){
-            var indexBullet = ammo.indexOf(item);
+            var indexBullet = vetorTiros.indexOf(item);
             scene.remove(item);
             scene.remove(vectorAmmoBB[indexBullet]);
-            ammo.splice(indexBullet, 1);
+            vetorTiros.splice(indexBullet, 1);
             vectorAmmoBB.splice(indexBullet, 1);
+            velTiros.splice(indexBullet, 1);
         }
     })
 }
@@ -273,19 +276,20 @@ function deleteAmmo(){
 //Função que move os inimigos
 function moveEnemies(){
     //Percorre o vetor de inimigos:
-    enemies.forEach(item => {
+    vetorInimigos.forEach(item => {
         //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
-        item.translateZ(velocidades[enemies.indexOf(item)]);
+        item.translateX(velInimigos[vetorInimigos.indexOf(item)].getVelocidadeX());
+        item.translateZ(velInimigos[vetorInimigos.indexOf(item)].getVelocidadeZ());
         //Atualiza sua posição em relação ao mundo:
         item.updateMatrixWorld(true);
         //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
         if(item.position.z >= 150){
-            var indexEnemy = enemies.indexOf(item);
+            var indexEnemy = vetorInimigos.indexOf(item);
             scene.remove(item);
             scene.remove(vectorEnemiesBB[indexEnemy]);
-            enemies.splice(indexEnemy, 1);
+            vetorInimigos.splice(indexEnemy, 1);
             vectorEnemiesBB.splice(indexEnemy, 1);
-            velocidades.splice(indexEnemy, 1);
+            velInimigos.splice(indexEnemy, 1);
         }
     })
 }
@@ -294,12 +298,12 @@ function moveEnemies(){
 function atualizaBB(){
     aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
-    enemies.forEach(inimigo => {
-        vectorEnemiesBB.at(enemies.indexOf(inimigo)).copy(inimigo.geometry.boundingBox).applyMatrix4(inimigo.matrixWorld);
+    vetorInimigos.forEach(inimigo => {
+        vectorEnemiesBB.at(vetorInimigos.indexOf(inimigo)).copy(inimigo.geometry.boundingBox).applyMatrix4(inimigo.matrixWorld);
     })
 
-    ammo.forEach(tiro => {
-        vectorAmmoBB.at(ammo.indexOf(tiro)).copy(tiro.geometry.boundingBox).applyMatrix4(tiro.matrixWorld);
+    vetorTiros.forEach(tiro => {
+        vectorAmmoBB.at(vetorTiros.indexOf(tiro)).copy(tiro.geometry.boundingBox).applyMatrix4(tiro.matrixWorld);
     })
 }
 
@@ -307,7 +311,7 @@ function atualizaBB(){
 //Função que checa colisões na cena:
 function checkCollisions(){
     //Mesh auxiliar
-    var aux = new THREE.Mesh();
+    var meshCopia = new THREE.Mesh();
     //Percorrendo o vetor de Box3 dos inimigos:
     vectorEnemiesBB.forEach(item => {
         //Percorrendo o vetor de Box3 dos tiros:
@@ -318,20 +322,21 @@ function checkCollisions(){
                 var indexEnemy = vectorEnemiesBB.indexOf(item);
                 var indexBullet = vectorAmmoBB.indexOf(box);
                 //Criação de uma cópia do inimigo morto (para a função de animação):
-                let enemyCopy = aux.copy(enemies[indexEnemy]);
+                let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy]);
                 //Adicionando a cópia no vetor:
                 killedEnemies.push(enemyCopy);
                 //Remoção dos itens e suas Box3 da cena:
                 scene.remove(box);
                 scene.remove(item);
-                scene.remove(ammo[indexBullet]);
-                scene.remove(enemies[indexEnemy]);
+                scene.remove(vetorTiros[indexBullet]);
+                scene.remove(vetorInimigos[indexEnemy]);
                 //Remoção dos itens, suas Box3 e velocidades de seus vetores:
-                ammo.splice(indexBullet, 1);
+                vetorTiros.splice(indexBullet, 1);
                 vectorAmmoBB.splice(indexBullet, 1);
-                enemies.splice(indexEnemy, 1);
+                velTiros.splice(indexBullet, 1);
+                vetorInimigos.splice(indexEnemy, 1);
                 vectorEnemiesBB.splice(indexEnemy, 1);
-                velocidades.splice(indexEnemy, 1);
+                velInimigos.splice(indexEnemy, 1);
             }
         })
         //Caso o avião esteja colidindo ou esteja dentro do inimigo, troca a variável booleana de animação do avião para 'true':

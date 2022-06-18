@@ -1,14 +1,10 @@
-import * as THREE from 'three';
-import {scene} from '../works/planeShooter.js';
+
 
 export default class Ammo {
     #velocidadeZ;
     #velocidadeY;
     #velocidadeX;
     constructor(tipo){
-        this.shoot = objeto;
-        this.ammoBB = bb;
-        this.shoot.position.set(target.x, target.y, target.z);
         if(tipo == "ar-ar"){
             this.#velocidadeY = 0;
             this.#velocidadeZ = -5;

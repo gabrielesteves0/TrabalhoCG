@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import {scene} from '../works/planeShooter.js';
+
 
 export default class Enemies {
     //Private
@@ -57,15 +56,15 @@ export default class Enemies {
         return this.#velocidadeZ;
     }
 
-    getPosicaoX(){
+    getPositionX(){
         return this.#positionX;
     }
 
-    getPosicaoY(){
+    getPositionY(){
         return this.#positionY;
     }
 
-    getPosicaoZ(){
+    getPositionZ(){
         return this.#positionZ;
     }
 
