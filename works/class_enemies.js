@@ -10,7 +10,7 @@ export default class Enemies {
     _positionZ;
     //_modelo;
     //Static
-    static vector = [];
+    //static vector = [];
     //Public
     enemyBB;
     enemy;
@@ -30,27 +30,26 @@ export default class Enemies {
             this._positionX = this._positionX * (-1);
         this.enemy.position.set(this._positionX, this._positionY, this._positionZ);
         scene.add(this.enemy);
-        Enemies.vector.push(this.enemy);
     }
     
-    static moveEnemies() {
-        Enemies.vector.forEach(item => {
-            item.enemy.translateZ(item._velocidadeZ);
-            item.enemy.translateX(item._velocidadeX);
-            item.enemy.updateMatrixWorld(true);
-            if(item.enemy.position.z >= 150 || item.enemy.position.x >= 260 || item.enemy.position.x <= -260){
-                var indexEnemy = enemies.indexOf(item);
-                scene.remove(item.enemy);
-                scene.remove(item.enemyBB);
-                vector.splice(indexEnemy, 1);
-            }
-        });
-    }
+    // static moveEnemies() {
+    //     Enemies.vector.forEach(item => {
+    //         item.enemy.translateZ(item._velocidadeZ);
+    //         item.enemy.translateX(item._velocidadeX);
+    //         item.enemy.updateMatrixWorld(true);
+    //         if(item.enemy.position.z >= 150 || item.enemy.position.x >= 260 || item.enemy.position.x <= -260){
+    //             var indexEnemy = enemies.indexOf(item);
+    //             scene.remove(item.enemy);
+    //             scene.remove(item.enemyBB);
+    //             vector.splice(indexEnemy, 1);
+    //         }
+    //     });
+    // }
 
-    static atualizaBB() {
-        Enemies.vector.forEach(inimigo => {
-            inimigo.enemyBB.copy(inimigo.enemy.geometry.boundingBox).applyMatrix4(inimigo.enemy.matrixWorld);
-        });
-    }
+    // static atualizaBB() {
+    //     Enemies.vector.forEach(inimigo => {
+    //         inimigo.enemyBB.copy(inimigo.enemy.geometry.boundingBox).applyMatrix4(inimigo.enemy.matrixWorld);
+    //     });
+    // }
 
 }
