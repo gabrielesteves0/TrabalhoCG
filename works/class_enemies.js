@@ -1,75 +1,34 @@
+import * as THREE from "../build/three.module.js";
 
+class Enemies {
 
-export default class Enemies {
-    //Private
-    #velocidadeX;
-    #velocidadeZ;
-    #positionX;
-    #positionY;
-    #positionZ;
-    //#modelo;
-    constructor(/*modeloInimigo, */movimento){
-        //this.#modelo = modeloInimigo;
+    object;
+    bBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+    #geometry = new THREE.BoxGeometry(10, 10, 10);
+    #material = new THREE.MeshLambertMaterial( { color: 0xffff00 });
+    velocidadeX;
+    velocidadeZ;
+    positionX;
+    positionY;
+    positionZ;
+    constructor(movimento){
+        this.object = new THREE.Mesh(this.#geometry, this.#material);
+        this.object.geometry.computeBoundingBox();
+        this.bBox.copy(this.object.geometry.boundingBox).applyMatrix4(this.object.matrixWorld);
+        this.object.castShadow = true;
         if(movimento == "diagonalEsquerda"){
-            this.#velocidadeX = 3;
-            this.#velocidadeZ = 3;
-            this.#positionX = -195;
-            this.#positionZ = 200;
-        }else if(movimento == "terrestre"){
-            this.#positionX = (Math.random() * 185);
-            this.#positionY = 10;
-            this.#positionZ = -500;
-            this.#velocidadeX = 0;
-            this.#velocidadeZ = (Math.random()*5) + 3;
-            let sinal = Math.random()*2;
-            if(sinal >= 1)
-                this.#positionX = this.#positionX * (-1);
+            this.velocidadeX = 2.5;
+            this.velocidadeZ = 3;
         }else if(movimento == "diagonalDireita"){
-            this.#velocidadeX = -3;
-            this.#velocidadeZ = 3;
-            this.#positionX = 195;
-            this.#positionZ = 200;
+            this.velocidadeX = -2.5;
+            this.velocidadeZ = 3;
         }else if(movimento == "horizontal"){
-            this.#positionZ = Math.random()*100;
-            this.#positionX = 250;
-            this.#velocidadeX = (Math.random()*5) + 1;
-            this.#velocidadeZ = 0;
-            let sinal = Math.random()*2;
-            if(sinal >= 1)
-                this.#positionX = positionX * (-1);
+            this.velocidadeX = (Math.random()*2) + 2;
+            this.velocidadeZ = 0;
         }else/* if(movimento == "vertical")*/{
-            this.#positionX = (Math.random() * 185);
-            this.#positionZ = -500;
-            this.#velocidadeX = 0;
-            this.#velocidadeZ = (Math.random()*5) + 3;
-            let sinal = Math.random()*2;
-            if(sinal >= 1)
-                this.#positionX = positionX * (-1);
+            this.velocidadeX = 0;
+            this.velocidadeZ = (Math.random()*5) + 3;
         }
     }
-
-    getVelocidadeX(){
-        return this.#velocidadeX;
-    }
-
-    getVelocidadeZ(){
-        return this.#velocidadeZ;
-    }
-
-    getPositionX(){
-        return this.#positionX;
-    }
-
-    getPositionY(){
-        return this.#positionY;
-    }
-
-    getPositionZ(){
-        return this.#positionZ;
-    }
-
-    // getModelo(){
-    //     return this.#modelo;
-    // }
-
 }
+export default Enemies;

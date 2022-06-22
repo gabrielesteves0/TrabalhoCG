@@ -12,10 +12,9 @@ import {initRenderer,
         degreesToRadians,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
-import {default as Enemies} from '../works/class_enemies.js';
-import {default as Ammo} from '../works/class_ammo.js';
+import Enemies from './class_enemies.js';
+import Ammo from '../works/class_ammo.js';
 
-// export {scene};
 
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils
@@ -71,10 +70,10 @@ function setDirectionalLighting(position)
   dirLight.castShadow = true;
 
   dirLight.shadow.camera.near = .1;
-  dirLight.shadow.camera.far = 500;
+  dirLight.shadow.camera.far = 800;
   dirLight.shadow.camera.left = -200;
   dirLight.shadow.camera.right = 200;
-  dirLight.shadow.camera.top = 50;
+  dirLight.shadow.camera.top = 250;
   dirLight.shadow.camera.bottom = -200;
 
   scene.add(dirLight);
@@ -99,43 +98,43 @@ function keyboardUpdate(){
 var axesHelper = new THREE.AxesHelper( 12 );
 scene.add( axesHelper );
 
-//Vetores para auxiliar no controle das munições, planos, inimigos e bounding boxes:
-// //Vetor para armazenar os tiros:
-var vetorTiros = [];
-//Vetor para armazenar os planos:
-var planes = [];
-// //Vetor para armazenar os inimigos:
-var vetorInimigos = [];
-// //Vetor para armazenar as velocidades de cada inimigo:
-var velInimigos = [];
 
-var velTiros = [];
-// //Vetor para armazenar as Box3 dos inimigos:
-var vectorEnemiesBB = [];
-// //Vetor para armazenar as Box3 dos tiros:
-var vectorAmmoBB = [];
+var vetorTiros = [];
+var planes = [];
+var vetorInimigos = [];
+var velocidadesX = [];
+var velocidadesZ = [];
+var velocidadesTiros = [];
+var posicoesX = [];
+var posicoesY = [];
+var posicoesZ = [];
+
 //Vetor para armazenar os inimigos mortos (auxilia na animação dos inimigos quando são atingidos):
 var killedEnemies = [];
 
 // Loop que cria os planos
-for(let i=0; i<3; i++){
-    let plane = createGroundPlaneWired(400, 400);
-    scene.add(plane);
-    plane.position.set(0,0,-(400*i));
-    plane.receiveShadow = true;
-    planes.push(plane);
-}
+// for(let i=0; i<3; i++){
+//     let plane = createGroundPlaneWired(400, 400);
+//     scene.add(plane);
+//     plane.position.set(0,0,-(400*i));
+//     plane.receiveShadow = true;
+//     planes.push(plane);
+// }
+
+let plane = createGroundPlaneWired(400, 8600);
+plane.position.set(0, 0, -4000);
+scene.add(plane);
 
 //Função que move os planos
-function movePlanes(){
-    planes.forEach(item => {
-        item.translateY(-1);
-        item.updateMatrixWorld(true);
-        if(item.position.z == 400){
-            item.position.set(0, 0, -800);
-        }
-    })
-}
+// function movePlanes(){
+//     planes.forEach(item => {
+//         item.translateY(-1);
+//         item.updateMatrixWorld(true);
+//         if(item.position.z == 400){
+//             item.position.set(0, 0, -800);
+//         }
+//     })
+// }
 
 
 //                                  MODELAGEM E DINÂMICA:
@@ -143,7 +142,7 @@ function movePlanes(){
 //Modelagem do avião:
 let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
 aviao.rotateX(degreesToRadians(-90));
-aviao.translateZ(10);
+aviao.position.set(0, 50, 10);
 scene.add(aviao);
 aviao.castShadow = true;
 //Variável booleana para auxiliar na animação quando o avião colide com algum inimigo. Caso ela seja 'false', o avião não colidiu. Se estiver 'true',
@@ -153,44 +152,99 @@ let auxAnimationAviao = false;
 //Vetor para auxiliar no direcionamento dos tiros, quando pressionada as teclas 'ctrl' e 'space':
 let target = new THREE.Vector3(0,0,0);
 //Criação da Box3 (bounding box) do avião:
-let aviaoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-aviaoBB.setFromObject(aviao);
+let aviaoBB = new THREE.Box3();
+aviao.geometry.computeBoundingBox(aviaoBB);
 
 
 //Função que cria os tiros:
 function createAmmo(){
-    //Modelagem dos tiros:
+    let tiro = new Ammo("ar-ar");
     aviao.getWorldPosition(target);
-    let aux = new Ammo("ar-ar");
-    let shoot = new THREE.Mesh(new THREE.SphereGeometry(1, 0, 0), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
-    shoot.position.set(target.x, target.y, target.z);
-    //Criação das Box3 (bounding boxes) dos tiros:
-    let ammoBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-    ammoBB.setFromObject(shoot);
-    scene.add(ammoBB);
-    //Aqui, colocamos as coordenadas do avião no vetor target (criado anteriormente), e então, a partir dele, definimos a posição inicial do tiro.
-    scene.add(shoot);
-    vetorTiros.push(shoot);
-    velTiros.push(aux);
-    vectorAmmoBB.push(ammoBB);
+    tiro.object.position.set(target.x, target.y, target.z);
+    scene.add(tiro.object);
+    //scene.add(tiro.bBox);
+    vetorTiros.push(tiro);
 }
+
+// function setVelocidadesInimigos(objeto, movimento){
+//     if(movimento == "diagonalEsquerda"){
+//         objeto.velocidadeX = 3;
+//         objeto.velocidadeZ = 3;
+//         objeto.positionX = -195;
+//         objeto.positionZ = 200;
+//     }else if(movimento == "terrestre"){
+//         objeto.positionX = (Math.random() * 185);
+//         objeto.positionY = 10;
+//         objeto.positionZ = -500;
+//         objeto.velocidadeX = 0;
+//         objeto.velocidadeZ = (Math.random()*5) + 3;
+//         let sinal = Math.random()*2;
+//         if(sinal >= 1)
+//         objeto.positionX = objeto.positionX * (-1);
+//     }else if(movimento == "diagonalDireita"){
+//         objeto.velocidadeX = -3;
+//         objeto.velocidadeZ = 3;
+//         objeto.positionX = 195;
+//         objeto.positionZ = 200;
+//     }else if(movimento == "horizontal"){
+//         objeto.positionZ = Math.random()*100;
+//         objeto.positionX = 250;
+//         objeto.velocidadeX = (Math.random()*5) + 1;
+//         objeto.velocidadeZ = 0;
+//         let sinal = Math.random()*2;
+//         if(sinal >= 1)
+//             objeto.positionX = objeto.positionX * (-1);
+//     }else/* if(movimento == "vertical")*/{
+//         objeto.positionX = (Math.random() * 185);
+//         objeto.positionZ = -500;
+//         objeto.velocidadeX = 0;
+//         objeto.velocidadeZ = (Math.random()*5) + 3;
+//         let sinal = Math.random()*2;
+//         if(sinal >= 1)
+//             objeto.positionX = objeto.positionX * (-1);
+//         }
+// }
+
+let velocidades = [];
 
 //Função que cria os inimigos
 function createEnemies(){
-    //Modelagem dos tiros:
-    let enemy = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial( { color: 0xffff00 } ));
-    enemy.castShadow = true;
-    //Criação das Box3 (bounding boxes) dos inimigos:
-    let enemiesBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-    enemiesBB.setFromObject(enemy);
-    scene.add(enemiesBB);
-    //Criação das Box3 (bounding boxes) dos inimigos:
-    let aux = new Enemies("terrestre");
-    enemy.position.set(aux.getPositionX(), aux.getPositionY(), aux.getPositionZ());
-    scene.add(enemy);
+
+    // let enemy = new Enemies("vertical");
+    // let positionX = (Math.random() * 185);
+    // let positionZ = -350;
+    // let sinal = Math.random()*2;
+    // if(sinal >= 1)
+    //     positionX = positionX * (-1);
+    // enemy.object.position.set(positionX, 50, positionZ);
+
+    // let enemy = new Enemies("horizontal");
+    // let positionX = -250;
+    // let positionZ = Math.random()*100 * (-1);
+    // enemy.object.position.set(positionX, 50, positionZ);
+
+    // let enemy = new Enemies("diagonalEsquerda");
+    // let positionX = -195;
+    // let positionZ = -300;
+    // enemy.object.position.set(positionX, 50, positionZ);
+
+    // let enemy = new Enemies("diagonalDireita");
+    // let positionX = 195;
+    // let positionZ = -300;
+    // enemy.object.position.set(positionX, 50, positionZ);
+
+    // let enemy = new Enemies("vertical");
+    // let positionX = (Math.random() * 185);
+    // let positionZ = -350;
+    // let sinal = Math.random()*2;
+    // if(sinal >= 1)
+    //     positionX = positionX * (-1);
+    // enemy.object.position.set(positionX, 8, positionZ);
+
+    scene.add(enemy.object);
+    //scene.add(enemy.bBox);
     vetorInimigos.push(enemy);
-    vectorEnemiesBB.push(enemiesBB);
-    velInimigos.push(aux);
+    //velocidades.push(velocidadeZ);
 }
 
 
@@ -229,7 +283,7 @@ function animationAviao(){
         aviao.material.color.setHex(0xff0000);
         //Quando a escala for menor que zero, reseta a posição, a escala e a cor, além de alterar a variável booleana para false:
         if(aviao.scale.x <= 0){
-            aviao.position.set(0,10,0);
+            aviao.position.set(0,50,10);
             auxAnimationAviao = false;
             aviao.scale.x = 1;
             aviao.scale.y = 1;
@@ -244,53 +298,40 @@ function animationAviao(){
 
 //Função que move os tiros
 function moveShoot(){
+    let index = 0;
     vetorTiros.forEach(item => {
-        // item.translateX(velTiros.at(ammo.indexOf(item)).getVelocidadeX);
-        // item.translateY(velTiros.at(ammo.indexOf(item)).getVelocidadeY);
-        item.translateZ(velTiros.at(vetorTiros.indexOf(item)).getVelocidadeZ);
-        
+        item.object.translateX(item.velocidadeX);
+        item.object.translateY(item.velocidadeY);
+        item.object.translateZ(item.velocidadeZ);
+        item.object.updateMatrixWorld(true);
+        //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
+        if(item.object.position.z <= -400 || item.object.position.x <= -200 || item.object.position.z >= 400 || item.object.position.x >= 200){
+            scene.remove(item.object);
+            scene.remove(item.bBox);
+            vetorTiros.splice(index, 1);
+        }
+        index++;
     });
 
 }
 
-//Função que deleta os tiros
-function deleteAmmo(){
-    //Percorre o vetor de tiros:
-    vetorTiros.forEach(item => {
-        //Atualiza a posição no mundo do tiro:
-        item.updateMatrixWorld(true);
-        //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
-        if(item.position.z <= -400){
-            var indexBullet = vetorTiros.indexOf(item);
-            scene.remove(item);
-            scene.remove(vectorAmmoBB[indexBullet]);
-            vetorTiros.splice(indexBullet, 1);
-            vectorAmmoBB.splice(indexBullet, 1);
-            velTiros.splice(indexBullet, 1);
-        }
-    })
-}
-
-
-
-//Função que move os inimigos
 function moveEnemies(){
-    //Percorre o vetor de inimigos:
+    let index = 0;
     vetorInimigos.forEach(item => {
         //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
-        item.translateX(velInimigos[vetorInimigos.indexOf(item)].getVelocidadeX());
-        item.translateZ(velInimigos[vetorInimigos.indexOf(item)].getVelocidadeZ());
+        item.object.translateZ(item.velocidadeZ);
+        item.object.translateX(item.velocidadeX);
         //Atualiza sua posição em relação ao mundo:
-        item.updateMatrixWorld(true);
+        item.object.updateMatrixWorld(true);
         //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
-        if(item.position.z >= 150){
+        if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
             var indexEnemy = vetorInimigos.indexOf(item);
-            scene.remove(item);
-            scene.remove(vectorEnemiesBB[indexEnemy]);
-            vetorInimigos.splice(indexEnemy, 1);
-            vectorEnemiesBB.splice(indexEnemy, 1);
-            velInimigos.splice(indexEnemy, 1);
+            scene.remove(item.object);
+            scene.remove(item.bBox);
+            vetorInimigos.splice(index, 1);
+            //velocidades.splice(indexEnemy, 1);
         }
+        index++;
     })
 }
 
@@ -298,51 +339,46 @@ function moveEnemies(){
 function atualizaBB(){
     aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
-    vetorInimigos.forEach(inimigo => {
-        vectorEnemiesBB.at(vetorInimigos.indexOf(inimigo)).copy(inimigo.geometry.boundingBox).applyMatrix4(inimigo.matrixWorld);
+    vetorInimigos.forEach(item => {
+        item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
     })
 
-    vetorTiros.forEach(tiro => {
-        vectorAmmoBB.at(vetorTiros.indexOf(tiro)).copy(tiro.geometry.boundingBox).applyMatrix4(tiro.matrixWorld);
+    vetorTiros.forEach(item => {
+        item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
     })
 }
 
 
 //Função que checa colisões na cena:
 function checkCollisions(){
-    //Mesh auxiliar
+    let indexEnemy = 0;
+    let indexBullet = 0;
     var meshCopia = new THREE.Mesh();
     //Percorrendo o vetor de Box3 dos inimigos:
-    vectorEnemiesBB.forEach(item => {
+    vetorInimigos.forEach(inimigo => {  //->item
         //Percorrendo o vetor de Box3 dos tiros:
-        vectorAmmoBB.forEach(box => {
+        vetorTiros.forEach(tiro => { //->box
             //Caso o Box3 do tiro esteja colidindo ou esteja dentro do inimigo:
-            if(box.intersectsBox(item) || box.containsBox(item)){
-                //Variáveis com os indexes do inimigo e do tiro:
-                var indexEnemy = vectorEnemiesBB.indexOf(item);
-                var indexBullet = vectorAmmoBB.indexOf(box);
-                //Criação de uma cópia do inimigo morto (para a função de animação):
-                let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy]);
+            if(tiro.bBox.intersectsBox(inimigo.bBox) || tiro.bBox.containsBox(inimigo.bBox)){
+                let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
                 //Adicionando a cópia no vetor:
                 killedEnemies.push(enemyCopy);
                 //Remoção dos itens e suas Box3 da cena:
-                scene.remove(box);
-                scene.remove(item);
-                scene.remove(vetorTiros[indexBullet]);
-                scene.remove(vetorInimigos[indexEnemy]);
-                //Remoção dos itens, suas Box3 e velocidades de seus vetores:
-                vetorTiros.splice(indexBullet, 1);
-                vectorAmmoBB.splice(indexBullet, 1);
-                velTiros.splice(indexBullet, 1);
+                scene.remove(tiro.object);
+                scene.remove(inimigo.object);
+                scene.remove(tiro.bBox);
+                scene.remove(inimigo.bBox);
                 vetorInimigos.splice(indexEnemy, 1);
-                vectorEnemiesBB.splice(indexEnemy, 1);
-                velInimigos.splice(indexEnemy, 1);
+                vetorTiros.splice(indexBullet, 1);
+                //velocidades.splice(indexEnemy, 1);
             }
+            indexBullet++;
         })
         //Caso o avião esteja colidindo ou esteja dentro do inimigo, troca a variável booleana de animação do avião para 'true':
-        if(item.intersectsBox(aviaoBB) || item.containsBox(aviaoBB)){
+        if(inimigo.bBox.intersectsBox(aviaoBB) || inimigo.bBox.containsBox(aviaoBB)){
             auxAnimationAviao = true;
         }
+        indexEnemy++;
     })
 }
 
@@ -366,8 +402,9 @@ function render()
     animationEnemy();
     animationAviao();
     moveShoot();
-    deleteAmmo();
-    movePlanes();
+    //movePlanes();
+    plane.translateY(-1);
+    //moveCamera();
     requestAnimationFrame(render);
     renderer.render(scene, camera) // Render scene
 }
