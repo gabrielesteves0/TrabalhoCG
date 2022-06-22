@@ -90,7 +90,14 @@ function keyboardUpdate(){
     if(keyboard.pressed("down") && aviao.position.z <= 120) aviao.translateY(-2);
     if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
     if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
-    if(keyboard.down("space") | keyboard.down("ctrl"))       createAmmo();
+    if(keyboard.down("space")){
+        aviao.getWorldPosition(posicaoAviao);
+        createAmmo("ar-ar", posicaoAviao);
+    }
+    if(keyboard.down("ctrl")){
+        aviao.getWorldPosition(posicaoAviao);
+        createAmmo("ar-terra", posicaoAviao);
+    }
 
 }
 
@@ -100,11 +107,8 @@ scene.add( axesHelper );
 
 
 var vetorTiros = [];
-var planes = [];
+//var planes = [];
 var vetorInimigos = [];
-var velocidadesX = [];
-var velocidadesZ = [];
-var velocidadesTiros = [];
 var posicoesX = [];
 var posicoesY = [];
 var posicoesZ = [];
@@ -150,66 +154,39 @@ aviao.castShadow = true;
 let auxAnimationAviao = false;
 
 //Vetor para auxiliar no direcionamento dos tiros, quando pressionada as teclas 'ctrl' e 'space':
-let target = new THREE.Vector3(0,0,0);
+let posicaoAviao = new THREE.Vector3(0,0,0);
 //Criação da Box3 (bounding box) do avião:
 let aviaoBB = new THREE.Box3();
 aviao.geometry.computeBoundingBox(aviaoBB);
 
 
 //Função que cria os tiros:
-function createAmmo(){
-    let tiro = new Ammo("ar-ar");
-    aviao.getWorldPosition(target);
+function createAmmo(tipo, target){
+    let tiro = new Ammo(tipo);
     tiro.object.position.set(target.x, target.y, target.z);
     scene.add(tiro.object);
-    //scene.add(tiro.bBox);
     vetorTiros.push(tiro);
 }
 
-// function setVelocidadesInimigos(objeto, movimento){
-//     if(movimento == "diagonalEsquerda"){
-//         objeto.velocidadeX = 3;
-//         objeto.velocidadeZ = 3;
-//         objeto.positionX = -195;
-//         objeto.positionZ = 200;
-//     }else if(movimento == "terrestre"){
-//         objeto.positionX = (Math.random() * 185);
-//         objeto.positionY = 10;
-//         objeto.positionZ = -500;
-//         objeto.velocidadeX = 0;
-//         objeto.velocidadeZ = (Math.random()*5) + 3;
-//         let sinal = Math.random()*2;
-//         if(sinal >= 1)
-//         objeto.positionX = objeto.positionX * (-1);
-//     }else if(movimento == "diagonalDireita"){
-//         objeto.velocidadeX = -3;
-//         objeto.velocidadeZ = 3;
-//         objeto.positionX = 195;
-//         objeto.positionZ = 200;
-//     }else if(movimento == "horizontal"){
-//         objeto.positionZ = Math.random()*100;
-//         objeto.positionX = 250;
-//         objeto.velocidadeX = (Math.random()*5) + 1;
-//         objeto.velocidadeZ = 0;
-//         let sinal = Math.random()*2;
-//         if(sinal >= 1)
-//             objeto.positionX = objeto.positionX * (-1);
-//     }else/* if(movimento == "vertical")*/{
-//         objeto.positionX = (Math.random() * 185);
-//         objeto.positionZ = -500;
-//         objeto.velocidadeX = 0;
-//         objeto.velocidadeZ = (Math.random()*5) + 3;
-//         let sinal = Math.random()*2;
-//         if(sinal >= 1)
-//             objeto.positionX = objeto.positionX * (-1);
-//         }
-// }
-
-let velocidades = [];
+function enemyShoot(){
+    vetorInimigos.forEach(item => {
+        var x = Math.random()*100;
+        if(x >=90){
+            item.object.updateMatrixWorld(true);
+            let posicaoInimigo = new THREE.Vector3();
+            item.object.getWorldPosition(posicaoInimigo);
+            if(item.terrestre == true)
+                createAmmo("terra-ar", posicaoInimigo);
+            else
+                createAmmo("inimigo", posicaoInimigo);  
+        }
+    });
+}
 
 //Função que cria os inimigos
 function createEnemies(){
 
+    //vertical
     // let enemy = new Enemies("vertical");
     // let positionX = (Math.random() * 185);
     // let positionZ = -350;
@@ -218,33 +195,40 @@ function createEnemies(){
     //     positionX = positionX * (-1);
     // enemy.object.position.set(positionX, 50, positionZ);
 
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
+
+    //horizontal
     // let enemy = new Enemies("horizontal");
     // let positionX = -250;
     // let positionZ = Math.random()*100 * (-1);
     // enemy.object.position.set(positionX, 50, positionZ);
 
+    //diagonal esquerda
     // let enemy = new Enemies("diagonalEsquerda");
     // let positionX = -195;
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
 
+    //diagonal direita
     // let enemy = new Enemies("diagonalDireita");
     // let positionX = 195;
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
 
-    // let enemy = new Enemies("vertical");
-    // let positionX = (Math.random() * 185);
-    // let positionZ = -350;
-    // let sinal = Math.random()*2;
-    // if(sinal >= 1)
-    //     positionX = positionX * (-1);
-    // enemy.object.position.set(positionX, 8, positionZ);
+    //terrestre
+    let enemy2 = new Enemies("terrestre");
+    let positionX2 = (Math.random() * 185);
+    let positionZ2 = -350;
+    let sinal2 = Math.random()*2;
+    if(sinal2 >= 1)
+        positionX2 = positionX2 * (-1);
+    enemy2.object.position.set(positionX2, 8, positionZ2);
+    enemy2.object.material.color.setHex(0xff0000); 
 
-    scene.add(enemy.object);
-    //scene.add(enemy.bBox);
-    vetorInimigos.push(enemy);
-    //velocidades.push(velocidadeZ);
+    scene.add(enemy2.object);
+    vetorInimigos.push(enemy2);
+
 }
 
 
@@ -304,8 +288,10 @@ function moveShoot(){
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
         item.object.updateMatrixWorld(true);
+        if(item.object.position.y >= 50)
+            item.resetVelocidadeY();
         //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
-        if(item.object.position.z <= -400 || item.object.position.x <= -200 || item.object.position.z >= 400 || item.object.position.x >= 200){
+        if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
             scene.remove(item.object);
             scene.remove(item.bBox);
             vetorTiros.splice(index, 1);
@@ -359,18 +345,24 @@ function checkCollisions(){
         //Percorrendo o vetor de Box3 dos tiros:
         vetorTiros.forEach(tiro => { //->box
             //Caso o Box3 do tiro esteja colidindo ou esteja dentro do inimigo:
-            if(tiro.bBox.intersectsBox(inimigo.bBox) || tiro.bBox.containsBox(inimigo.bBox)){
-                let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
-                //Adicionando a cópia no vetor:
-                killedEnemies.push(enemyCopy);
-                //Remoção dos itens e suas Box3 da cena:
-                scene.remove(tiro.object);
-                scene.remove(inimigo.object);
-                scene.remove(tiro.bBox);
-                scene.remove(inimigo.bBox);
-                vetorInimigos.splice(indexEnemy, 1);
-                vetorTiros.splice(indexBullet, 1);
-                //velocidades.splice(indexEnemy, 1);
+            if(tiro.inimigo == false){
+                if(tiro.bBox.intersectsBox(inimigo.bBox) || tiro.bBox.containsBox(inimigo.bBox)){
+                    let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
+                    //Adicionando a cópia no vetor:
+                    killedEnemies.push(enemyCopy);
+                    //Remoção dos itens e suas Box3 da cena:
+                    scene.remove(tiro.object);
+                    scene.remove(inimigo.object);
+                    vetorInimigos.splice(indexEnemy, 1);
+                    vetorTiros.splice(indexBullet, 1);
+                    //velocidades.splice(indexEnemy, 1);
+                }
+            }else{
+                if(tiro.bBox.intersectsBox(aviaoBB) || tiro.bBox.containsBox(aviaoBB)){
+                    auxAnimationAviao = true;
+                    scene.remove(tiro.object);
+                    vetorTiros.splice(indexBullet, 1);
+                }
             }
             indexBullet++;
         })
@@ -392,9 +384,10 @@ function render()
     //Criação de um numero aleatório entre 0 e 100:
     let x = Math.random()*100;
     //Caso seja maior que 95, cria um inimigo aleatoriamente:
-    if(x >= 95)
+    if(x >= 98.5)
         createEnemies();
     //Chamada das funções no render:
+    enemyShoot();
     moveEnemies();
     atualizaBB();
     checkCollisions();

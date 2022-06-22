@@ -11,6 +11,7 @@ class Enemies {
     positionX;
     positionY;
     positionZ;
+    terrestre = false;
     constructor(movimento){
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.object.geometry.computeBoundingBox();
@@ -25,9 +26,13 @@ class Enemies {
         }else if(movimento == "horizontal"){
             this.velocidadeX = (Math.random()*2) + 2;
             this.velocidadeZ = 0;
-        }else/* if(movimento == "vertical")*/{
+        }else if(movimento == "vertical"){
             this.velocidadeX = 0;
-            this.velocidadeZ = (Math.random()*5) + 3;
+            this.velocidadeZ = (Math.random()*5) + 1;
+        }else{
+            this.velocidadeX = 0;
+            this.velocidadeZ = (Math.random()*5) + 1;
+            this.terrestre = true;
         }
     }
 }
