@@ -29,7 +29,6 @@ export function objCura(){
   
     objRecarga = CSG.toMesh(objRecargaCSG, auxMat);
     objRecarga.material = material;
-    objRecarga.position.set = (0, 3, 0);
     return objRecarga;
   }
   

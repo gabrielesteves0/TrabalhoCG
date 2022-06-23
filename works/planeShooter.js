@@ -175,7 +175,7 @@ function createAmmo(tipo, target){
 function enemyShoot(){
     vetorInimigos.forEach(item => {
         var x = Math.random()*100;
-        if(x >=90){
+        if(x >=99){
             item.object.updateMatrixWorld(true);
             let posicaoInimigo = new THREE.Vector3();
             item.object.getWorldPosition(posicaoInimigo);
@@ -191,16 +191,16 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    // let enemy = new Enemies("vertical");
-    // let positionX = (Math.random() * 185);
-    // let positionZ = -350;
-    // let sinal = Math.random()*2;
-    // if(sinal >= 1)
-    //     positionX = positionX * (-1);
-    // enemy.object.position.set(positionX, 50, positionZ);
+    let enemy = new Enemies("vertical");
+    let positionX = (Math.random() * 185);
+    let positionZ = -350;
+    let sinal = Math.random()*2;
+    if(sinal >= 1)
+        positionX = positionX * (-1);
+    enemy.object.position.set(positionX, 50, positionZ);
 
-    // vetorInimigos.push(enemy);
-    // scene.add(enemy.object);
+    vetorInimigos.push(enemy);
+    scene.add(enemy.object);
 
     //horizontal
     // let enemy = new Enemies("horizontal");
@@ -293,9 +293,13 @@ function atualizaBB(){
 
     vetorInimigos.forEach(item => {
         item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
-    })
+    });
 
     vetorTiros.forEach(item => {
+        item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
+    });
+
+    vetorCuras.forEach(item => {
         item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
     })
 }
@@ -352,7 +356,7 @@ function moveObjects(){
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
         item.object.updateMatrixWorld(true);
-        if(item.object.position.y >= 50)
+        if(item.object.position.y >= 50 && item.terraAr)
             item.resetVelocidadeY();
         //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
         if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
@@ -378,14 +382,11 @@ function checkCollisions(){
             if(tiro.inimigo == false){
                 if(tiro.bBox.intersectsBox(inimigo.bBox) || tiro.bBox.containsBox(inimigo.bBox)){
                     let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
-                    //Adicionando a cópia no vetor:
                     killedEnemies.push(enemyCopy);
-                    //Remoção dos itens e suas Box3 da cena:
                     scene.remove(tiro.object);
                     scene.remove(inimigo.object);
                     vetorInimigos.splice(indexEnemy, 1);
                     vetorTiros.splice(indexBullet, 1);
-                    //velocidades.splice(indexEnemy, 1);
                 }
             }else{
                 if((tiro.bBox.intersectsBox(aviaoBB) || tiro.bBox.containsBox(aviaoBB)) && !modoInvencivel){
@@ -393,6 +394,7 @@ function checkCollisions(){
                         vidas = vidas - 2;
                     else
                         vidas--;
+                    console.log("vidas: " + vidas);
                     scene.remove(tiro.object);
                     vetorTiros.splice(indexBullet, 1);
                     if(vidas <= 0)
@@ -400,15 +402,30 @@ function checkCollisions(){
                 }
             }
             indexBullet++;
-        })
+        });
         //Caso o avião esteja colidindo ou esteja dentro do inimigo, troca a variável booleana de animação do avião para 'true':
         if((inimigo.bBox.intersectsBox(aviaoBB) || inimigo.bBox.containsBox(aviaoBB)) && !modoInvencivel){
             vidas = vidas - 2;
+            console.log("vidas: " + vidas);
             if(vidas <= 0)
                 auxAnimationAviao = true;
+            let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
+            killedEnemies.push(enemyCopy);
+            scene.remove(inimigo.object);
+            vetorInimigos.splice(indexEnemy, 1);
         }
         indexEnemy++;
-    })
+    });
+    let index = 0;
+    vetorCuras.forEach(cura =>{
+        if(cura.bBox.intersectsBox(aviaoBB) || cura.bBox.containsBox(aviaoBB)){
+            vidas++;
+            console.log("vidas: " + vidas);
+            scene.remove(cura.object);
+            vetorCuras.splice(index, 1);
+        }
+        index++;
+    });
 }
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
