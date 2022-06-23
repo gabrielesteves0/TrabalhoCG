@@ -14,6 +14,7 @@ import {initRenderer,
 import KeyboardState from '../libs/util/KeyboardState.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
+import Heal from '../works/class_heal.js';
 
 
 var scene = new THREE.Scene();    // Create main scene
@@ -98,6 +99,7 @@ function keyboardUpdate(){
         aviao.getWorldPosition(posicaoAviao);
         createAmmo("ar-terra", posicaoAviao);
     }
+    if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
 
 }
 
@@ -149,6 +151,8 @@ aviao.rotateX(degreesToRadians(-90));
 aviao.position.set(0, 50, 10);
 scene.add(aviao);
 aviao.castShadow = true;
+let vidas = 5;
+let modoInvencivel = false;
 //Variável booleana para auxiliar na animação quando o avião colide com algum inimigo. Caso ela seja 'false', o avião não colidiu. Se estiver 'true',
 //significa que o avião colidiu com algum inimigo, então a função que executa sua animação atua.
 let auxAnimationAviao = false;
@@ -280,46 +284,8 @@ function animationAviao(){
 
 //                                  SISTEMA DE TIRO E COLISÃO:
 
-//Função que move os tiros
-function moveShoot(){
-    let index = 0;
-    vetorTiros.forEach(item => {
-        item.object.translateX(item.velocidadeX);
-        item.object.translateY(item.velocidadeY);
-        item.object.translateZ(item.velocidadeZ);
-        item.object.updateMatrixWorld(true);
-        if(item.object.position.y >= 50)
-            item.resetVelocidadeY();
-        //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
-        if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
-            scene.remove(item.object);
-            scene.remove(item.bBox);
-            vetorTiros.splice(index, 1);
-        }
-        index++;
-    });
 
-}
 
-function moveEnemies(){
-    let index = 0;
-    vetorInimigos.forEach(item => {
-        //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
-        item.object.translateZ(item.velocidadeZ);
-        item.object.translateX(item.velocidadeX);
-        //Atualiza sua posição em relação ao mundo:
-        item.object.updateMatrixWorld(true);
-        //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
-        if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
-            var indexEnemy = vetorInimigos.indexOf(item);
-            scene.remove(item.object);
-            scene.remove(item.bBox);
-            vetorInimigos.splice(index, 1);
-            //velocidades.splice(indexEnemy, 1);
-        }
-        index++;
-    })
-}
 
 //Função para atualizar a posição das Box3 dos elementos. Basicamente, com isto, as Bounding Boxes se movem junto com seus respectivos objetos.
 function atualizaBB(){
@@ -332,6 +298,70 @@ function atualizaBB(){
     vetorTiros.forEach(item => {
         item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
     })
+}
+
+let vetorCuras = [];
+
+function createHealObject(){
+    let cura = new Heal();
+    let posicaoX = Math.random()*185;
+    let sinal = Math.random()*2;
+    if(sinal > 1){
+        posicaoX = posicaoX * (-1);
+    }
+    cura.object.translateZ(-300);
+    cura.object.translateY(50);
+    cura.object.translateX(posicaoX);
+    //cura.object.position.set(posicaoX, 50, -300);
+    scene.add(cura.object);
+    vetorCuras.push(cura);
+}
+
+
+function moveObjects(){
+    let index = 0;
+    vetorCuras.forEach(item => {
+        item.object.translateZ(item.velocidade);
+        item.object.updateMatrixWorld(true);
+        if(item.object.position.z >= 150){
+            scene.remove(item.object);
+            vetorCuras.splice(index, 1);
+        }
+        index++;
+    });
+
+    index = 0;
+    
+    vetorInimigos.forEach(item => {
+        //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
+        item.object.translateZ(item.velocidadeZ);
+        item.object.translateX(item.velocidadeX);
+        //Atualiza sua posição em relação ao mundo:
+        item.object.updateMatrixWorld(true);
+        //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
+        if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
+            scene.remove(item.object);
+            vetorInimigos.splice(index, 1);
+        }
+        index++;
+    });
+
+    index = 0;
+    vetorTiros.forEach(item => {
+        item.object.translateX(item.velocidadeX);
+        item.object.translateY(item.velocidadeY);
+        item.object.translateZ(item.velocidadeZ);
+        item.object.updateMatrixWorld(true);
+        if(item.object.position.y >= 50)
+            item.resetVelocidadeY();
+        //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
+        if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
+            scene.remove(item.object);
+            vetorTiros.splice(index, 1);
+        }
+        index++;
+    });
+
 }
 
 
@@ -358,17 +388,24 @@ function checkCollisions(){
                     //velocidades.splice(indexEnemy, 1);
                 }
             }else{
-                if(tiro.bBox.intersectsBox(aviaoBB) || tiro.bBox.containsBox(aviaoBB)){
-                    auxAnimationAviao = true;
+                if((tiro.bBox.intersectsBox(aviaoBB) || tiro.bBox.containsBox(aviaoBB)) && !modoInvencivel){
+                    if(tiro.terraAr)
+                        vidas = vidas - 2;
+                    else
+                        vidas--;
                     scene.remove(tiro.object);
                     vetorTiros.splice(indexBullet, 1);
+                    if(vidas <= 0)
+                        auxAnimationAviao = true;
                 }
             }
             indexBullet++;
         })
         //Caso o avião esteja colidindo ou esteja dentro do inimigo, troca a variável booleana de animação do avião para 'true':
-        if(inimigo.bBox.intersectsBox(aviaoBB) || inimigo.bBox.containsBox(aviaoBB)){
-            auxAnimationAviao = true;
+        if((inimigo.bBox.intersectsBox(aviaoBB) || inimigo.bBox.containsBox(aviaoBB)) && !modoInvencivel){
+            vidas = vidas - 2;
+            if(vidas <= 0)
+                auxAnimationAviao = true;
         }
         indexEnemy++;
     })
@@ -386,18 +423,18 @@ function render()
     //Caso seja maior que 95, cria um inimigo aleatoriamente:
     if(x >= 98.5)
         createEnemies();
+    let y = Math.random()*100;
+    if(y >= 99)
+        createHealObject();
     //Chamada das funções no render:
     enemyShoot();
-    moveEnemies();
+    moveObjects();
     atualizaBB();
     checkCollisions();
     keyboardUpdate();
     animationEnemy();
     animationAviao();
-    moveShoot();
-    //movePlanes();
     plane.translateY(-1);
-    //moveCamera();
     requestAnimationFrame(render);
     renderer.render(scene, camera) // Render scene
 }

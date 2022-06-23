@@ -10,9 +10,11 @@ class Ammo {
     velocidadeY;
     velocidadeZ;
     inimigo;
+    terraAr;
     constructor(tipo){
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.inimigo = false;
+        this.terraAr = false;
         this.object.geometry.computeBoundingBox();
         this.bBox.copy(this.object.geometry.boundingBox).applyMatrix4(this.object.matrixWorld);
         this.object.castShadow = true;
@@ -29,6 +31,7 @@ class Ammo {
         }else{
             this.velocidadeY = 3;
             this.velocidadeZ = 3;
+            this.terraAr = true;
             this.inimigo = true;
         }
         this.velocidadeX = 0;

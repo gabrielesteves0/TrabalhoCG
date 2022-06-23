@@ -8,9 +8,6 @@ class Enemies {
     #material = new THREE.MeshLambertMaterial( { color: 0xffff00 });
     velocidadeX;
     velocidadeZ;
-    positionX;
-    positionY;
-    positionZ;
     terrestre = false;
     constructor(movimento){
         this.object = new THREE.Mesh(this.#geometry, this.#material);
