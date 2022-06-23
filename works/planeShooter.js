@@ -175,7 +175,7 @@ function createAmmo(tipo, target){
 function enemyShoot(){
     vetorInimigos.forEach(item => {
         var x = Math.random()*100;
-        if(x >=99){
+        if(x >=80){
             item.object.updateMatrixWorld(true);
             let posicaoInimigo = new THREE.Vector3();
             item.object.getWorldPosition(posicaoInimigo);
@@ -234,6 +234,7 @@ function createEnemies(){
     vetorInimigos.push(enemy2);
 
 }
+
 
 
 //Função que anima os inimigos mortos:
@@ -355,6 +356,11 @@ function moveObjects(){
         item.object.translateX(item.velocidadeX);
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
+        // let target = new THREE.Vector3(0, 0, 0);
+        // target = aviao.worldToLocal(item.object.position.clone());
+        // let dist = aviao.position.distanceTo(item.object.position)/1000;
+        // dist = dist*(-1);
+        // item.object.translateOnAxis(target, dist);
         item.object.updateMatrixWorld(true);
         if(item.object.position.y >= 50 && item.terraAr)
             item.resetVelocidadeY();
