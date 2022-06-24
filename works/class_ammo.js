@@ -11,13 +11,14 @@ class Ammo {
     velocidadeZ;
     inimigo;
     terraAr;
-    constructor(tipo){
+    constructor(tipo, distx, distz){
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.inimigo = false;
         this.terraAr = false;
         this.object.geometry.computeBoundingBox();
         this.bBox.copy(this.object.geometry.boundingBox).applyMatrix4(this.object.matrixWorld);
         this.object.castShadow = true;
+        this.velocidadeX = 0;
         if(tipo == "ar-ar"){
             this.velocidadeY = 0;
             this.velocidadeZ = -5;
@@ -30,17 +31,23 @@ class Ammo {
             this.velocidadeZ = -8;
         }else{
             this.velocidadeY = 3;
-            this.velocidadeZ = 3;
+            this.velocidadeZ = 5;
+            let variacao = distz/this.velocidadeZ;
+            let velX = distx/variacao;
+            this.velocidadeX = velX;
             this.terraAr = true;
             this.inimigo = true;
         }
-        this.velocidadeX = 0;
     }
 
     resetVelocidadeY(){
         this.velocidadeY = 0;
-        this.velocidadeZ = 5;
     }
+
+    inverteVelocidadeX(){
+        this.velocidadeX = this.velocidadeX * (-1);
+    }
+
 }
 export default Ammo;
 

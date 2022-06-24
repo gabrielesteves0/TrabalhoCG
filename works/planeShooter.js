@@ -227,8 +227,15 @@ function resetaVidas(){
 
 
 //Função que cria os tiros:
-function createAmmo(tipo, target){
-    let tiro = new Ammo(tipo);
+function createAmmo(tipo, target, distx, distz){
+    let tiro;
+    aviao.updateMatrixWorld(true);
+    if(tipo == "terra-ar"){
+        tiro = new Ammo(tipo, distx, distz);
+        if(target.x > 0 && aviao.position.x < target.x)
+            tiro.inverteVelocidadeX();
+    }else
+        tiro = new Ammo(tipo, 0, 0);
     tiro.object.position.set(target.x, target.y, target.z);
     scene.add(tiro.object);
     vetorTiros.push(tiro);
@@ -237,14 +244,21 @@ function createAmmo(tipo, target){
 function enemyShoot(){
     vetorInimigos.forEach(item => {
         var x = Math.random()*100;
-        if(x >=80){
+        if(x >=99){
             item.object.updateMatrixWorld(true);
             let posicaoInimigo = new THREE.Vector3();
             item.object.getWorldPosition(posicaoInimigo);
-            if(item.terrestre == true)
-                createAmmo("terra-ar", posicaoInimigo);
-            else
-                createAmmo("inimigo", posicaoInimigo);  
+            aviao.updateMatrixWorld(true);
+            console.log(aviao.position.x);
+            let pos = new THREE.Vector3();
+            if(pos.z > posicaoInimigo.z){
+                let distx = Math.abs(pos.x - item.object.position.x);
+                let distz = Math.abs(pos.z - item.object.position.z);
+                if(item.terrestre == true)
+                    createAmmo("terra-ar", posicaoInimigo, distx, distz);
+                else
+                    createAmmo("inimigo", posicaoInimigo, 0, 0);
+            }
         }
     });
 }
@@ -253,16 +267,16 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    let enemy = new Enemies("vertical");
-    let positionX = (Math.random() * 175);
-    let positionZ = -350;
-    let sinal = Math.random()*2;
-    if(sinal >= 1)
-        positionX = positionX * (-1);
-    enemy.object.position.set(positionX, 50, positionZ);
+    // let enemy = new Enemies("vertical");
+    // let positionX = (Math.random() * 175);
+    // let positionZ = -350;
+    // let sinal = Math.random()*2;
+    // if(sinal >= 1)
+    //     positionX = positionX * (-1);
+    // enemy.object.position.set(positionX, 50, positionZ);
 
-    vetorInimigos.push(enemy);
-    scene.add(enemy.object);
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
 
     //horizontal
     // let enemy = new Enemies("horizontal");
@@ -424,8 +438,9 @@ function moveObjects(){
         // dist = dist*(-1);
         // item.object.translateOnAxis(target, dist);
         item.object.updateMatrixWorld(true);
-        if(item.object.position.y >= 50 && item.terraAr)
+        if(item.object.position.y >= 50 && item.terraAr){
             item.resetVelocidadeY();
+        }
         //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
         if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
             scene.remove(item.object);
@@ -480,7 +495,6 @@ function checkCollisions(){
             perdeVida();
             vidas--;
             perdeVida();
-            console.log("vidas: " + vidas);
             if(vidas <= 0)
                 auxAnimationAviao = true;
             let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
@@ -497,7 +511,6 @@ function checkCollisions(){
                 ganhaVida();
                 vidas++;
             }
-            console.log("vidas: " + vidas);
             scene.remove(cura.object);
             vetorCuras.splice(index, 1);
         }
@@ -523,7 +536,7 @@ function render()
     if(y >= 99)
         createHealObject();
     //Chamada das funções no render:
-    //enemyShoot();
+    enemyShoot();
     moveObjects();
     atualizaBB();
     checkCollisions();
