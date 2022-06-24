@@ -43,10 +43,10 @@ cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
 
 //Criação da camera virtual para o viewport
-var virtualCamera = new THREE.PerspectiveCamera(45, 300/200, .1, 10);
-  virtualCamera.position.set(0, -20, 0);
+var virtualCamera = new THREE.PerspectiveCamera(45, 300/100, .1, 10);
+  virtualCamera.position.set(0, -15, 0);
   virtualCamera.up.set(0, 1, 0);
-  virtualCamera.lookAt(0, 0, 0);
+  virtualCamera.lookAt(0, 0, -20);
 
 
 
@@ -63,8 +63,8 @@ function controlledRender(){
     renderer.render(scene, camera);   
 
     var offset = 30; 
-    renderer.setViewport(offset, height-200-offset, 300, 200);  // Set virtual camera viewport  
-    renderer.setScissor(offset, height-200-offset, 300, 200); // Set scissor with the same size as the viewport
+    renderer.setViewport(offset, height-100-offset, 300, 100);  // Set virtual camera viewport  
+    renderer.setScissor(offset, height-100-offset, 300, 100); // Set scissor with the same size as the viewport
     renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
     renderer.setClearColor("rgb(60, 50, 150)");  // Use a darker clear color in the small viewport 
     renderer.clear(); // Clean the small viewport
@@ -188,27 +188,42 @@ let posicaoAviao = new THREE.Vector3(0,0,0);
 let aviaoBB = new THREE.Box3();
 aviao.geometry.computeBoundingBox(aviaoBB);
 
-// let vetorVidas = [];
+let vetorVidas = [];
 
-// for(let i = 0; i < 5; i++){
-//     let bolinha = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 32), 
-//      new THREE.MeshLambertMaterial({color: 0xff0000}));
-//     bolinha.position.set(0, -15, 0);
-//     scene.add(bolinha);
-//     vetorVidas.push(bolinha);
-// }
+for(let i = 0; i < 5; i++){
+    let bolinha = new THREE.Mesh(new THREE.SphereGeometry(1.3, 32, 32), 
+     new THREE.MeshLambertMaterial({color: 0xff0000}));
+    if(i == 0)
+        bolinha.position.set(-6, -10, -7);
+    else if(i == 1)
+        bolinha.position.set(-3, -10, -7);
+    else if(i == 2)
+        bolinha.position.set(0, -10, -7);
+    else if(i == 3)
+        bolinha.position.set(3, -10, -7);
+    else
+        bolinha.position.set(6, -10, -7);
+    //bolinha.position.set(0, -8.6, -7);
+    scene.add(bolinha);
+    vetorVidas.push(bolinha);
+}
 
-// function perdeVida(){
-//     if(vidas >= 0)
-//         scene.remove(vetorVidas.at(vidas));
-// }
+function perdeVida(){
+    if(vidas >= 0)
+        scene.remove(vetorVidas.at(vidas));
+}
 
-// function resetaVidas(){
-    //     if(vidas < 0){
-    //         for(let i=0; i<5; i++)
-    //             scene.add(vetorVidas.at(i));
-    //     }
-    // }
+function ganhaVida(){
+    scene.add(vetorVidas.at(vidas));
+}
+
+function resetaVidas(){
+        if(vidas <= 0){
+            vidas = 5;
+            for(let i=0; i<5; i++)
+                scene.add(vetorVidas.at(i));
+        }
+    }
 
 
 //Função que cria os tiros:
@@ -478,7 +493,10 @@ function checkCollisions(){
     let index = 0;
     vetorCuras.forEach(cura =>{
         if(cura.bBox.intersectsBox(aviaoBB) || cura.bBox.containsBox(aviaoBB)){
-            vidas++;
+            if(vidas < 5){
+                ganhaVida();
+                vidas++;
+            }
             console.log("vidas: " + vidas);
             scene.remove(cura.object);
             vetorCuras.splice(index, 1);
@@ -512,7 +530,7 @@ function render()
     keyboardUpdate();
     animationEnemy();
     animationAviao();
-    //resetaVidas();
+    resetaVidas();
     plane.translateY(-1);
     controlledRender();
     requestAnimationFrame(render);
