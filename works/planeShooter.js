@@ -129,6 +129,7 @@ function keyboardUpdate(){
         createAmmo("ar-terra", posicaoAviao);
     }
     if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
+    if(keyboard.down("enter"))  resetaJogo();
 
 }
 
@@ -136,6 +137,29 @@ function keyboardUpdate(){
 var axesHelper = new THREE.AxesHelper( 12 );
 scene.add( axesHelper );
 
+function resetaJogo(){
+    for(let i = 0; i < 3; i++){
+        let index = 0;
+        vetorCuras.forEach(item => {
+            scene.remove(item.object);
+            vetorCuras.splice(index, 1);
+            index++;
+        });
+        index = 0;
+        vetorInimigos.forEach(item => {
+            scene.remove(item.object);
+            vetorInimigos.splice(index, 1);
+            index++;
+        });
+        index = 0;
+        vetorTiros.forEach(item => {
+            scene.remove(item.object);
+            vetorTiros.splice(index, 1);
+            index++;
+        });
+    }
+    plane.position.set(0, 0, -4000);
+}
 
 var vetorTiros = [];
 //var planes = [];
@@ -232,7 +256,7 @@ function createAmmo(tipo, target, distx, distz){
     aviao.updateMatrixWorld(true);
     if(tipo == "terra-ar"){
         tiro = new Ammo(tipo, distx, distz);
-        if(target.x > 0 && aviao.position.x < target.x)
+        if(aviao.position.x < target.x)
             tiro.inverteVelocidadeX();
     }else
         tiro = new Ammo(tipo, 0, 0);
@@ -249,8 +273,8 @@ function enemyShoot(){
             let posicaoInimigo = new THREE.Vector3();
             item.object.getWorldPosition(posicaoInimigo);
             aviao.updateMatrixWorld(true);
-            console.log(aviao.position.x);
             let pos = new THREE.Vector3();
+            aviao.getWorldPosition(pos);
             if(pos.z > posicaoInimigo.z){
                 let distx = Math.abs(pos.x - item.object.position.x);
                 let distz = Math.abs(pos.z - item.object.position.z);
@@ -267,16 +291,16 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    // let enemy = new Enemies("vertical");
-    // let positionX = (Math.random() * 175);
-    // let positionZ = -350;
-    // let sinal = Math.random()*2;
-    // if(sinal >= 1)
-    //     positionX = positionX * (-1);
-    // enemy.object.position.set(positionX, 50, positionZ);
+    let enemy = new Enemies("vertical");
+    let positionX = (Math.random() * 175);
+    let positionZ = -350;
+    let sinal = Math.random()*2;
+    if(sinal >= 1)
+        positionX = positionX * (-1);
+    enemy.object.position.set(positionX, 50, positionZ);
 
-    // vetorInimigos.push(enemy);
-    // scene.add(enemy.object);
+    vetorInimigos.push(enemy);
+    scene.add(enemy.object);
 
     //horizontal
     // let enemy = new Enemies("horizontal");
@@ -483,8 +507,10 @@ function checkCollisions(){
                         perdeVida();
                     scene.remove(tiro.object);
                     vetorTiros.splice(indexBullet, 1);
-                    if(vidas <= 0)
+                    if(vidas <= 0){
                         auxAnimationAviao = true;
+                        resetaJogo();
+                    }
                 }
             }
             indexBullet++;
@@ -495,12 +521,15 @@ function checkCollisions(){
             perdeVida();
             vidas--;
             perdeVida();
-            if(vidas <= 0)
+            if(vidas <= 0){
                 auxAnimationAviao = true;
-            let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
-            killedEnemies.push(enemyCopy);
-            scene.remove(inimigo.object);
-            vetorInimigos.splice(indexEnemy, 1);
+                resetaJogo();
+            }else{
+                let enemyCopy = meshCopia.copy(vetorInimigos[indexEnemy].object);
+                killedEnemies.push(enemyCopy);
+                scene.remove(inimigo.object);
+                vetorInimigos.splice(indexEnemy, 1);
+            }
         }
         indexEnemy++;
     });
