@@ -42,6 +42,35 @@ cameraHolder.translateX(5);
 cameraHolder.rotateY(degreesToRadians(300));
 scene.add(cameraHolder);
 
+//Criação da camera virtual para o viewport
+var virtualCamera = new THREE.PerspectiveCamera(45, 300/200, .1, 10);
+  virtualCamera.position.set(0, -20, 0);
+  virtualCamera.up.set(0, 1, 0);
+  virtualCamera.lookAt(0, 0, 0);
+
+
+
+function controlledRender(){
+
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
+    // Set main viewport
+    renderer.setViewport(0, 0, width, height); // Reset viewport    
+    renderer.setScissorTest(false); // Disable scissor to paint the entire window
+    renderer.setClearColor("rgb(80, 70, 170)");    
+    renderer.clear();   // Clean the window
+    renderer.render(scene, camera);   
+
+    var offset = 30; 
+    renderer.setViewport(offset, height-200-offset, 300, 200);  // Set virtual camera viewport  
+    renderer.setScissor(offset, height-200-offset, 300, 200); // Set scissor with the same size as the viewport
+    renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
+    renderer.setClearColor("rgb(60, 50, 150)");  // Use a darker clear color in the small viewport 
+    renderer.clear(); // Clean the small viewport
+    renderer.render(scene, virtualCamera);  // Render scene of the virtual camera
+}
+
 
 //Criação da luz direcional
 var lightPosition = new THREE.Vector3(0, 40, 20);
@@ -153,15 +182,33 @@ scene.add(aviao);
 aviao.castShadow = true;
 let vidas = 5;
 let modoInvencivel = false;
-//Variável booleana para auxiliar na animação quando o avião colide com algum inimigo. Caso ela seja 'false', o avião não colidiu. Se estiver 'true',
-//significa que o avião colidiu com algum inimigo, então a função que executa sua animação atua.
 let auxAnimationAviao = false;
 
-//Vetor para auxiliar no direcionamento dos tiros, quando pressionada as teclas 'ctrl' e 'space':
 let posicaoAviao = new THREE.Vector3(0,0,0);
-//Criação da Box3 (bounding box) do avião:
 let aviaoBB = new THREE.Box3();
 aviao.geometry.computeBoundingBox(aviaoBB);
+
+// let vetorVidas = [];
+
+// for(let i = 0; i < 5; i++){
+//     let bolinha = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 32), 
+//      new THREE.MeshLambertMaterial({color: 0xff0000}));
+//     bolinha.position.set(0, -15, 0);
+//     scene.add(bolinha);
+//     vetorVidas.push(bolinha);
+// }
+
+// function perdeVida(){
+//     if(vidas >= 0)
+//         scene.remove(vetorVidas.at(vidas));
+// }
+
+// function resetaVidas(){
+    //     if(vidas < 0){
+    //         for(let i=0; i<5; i++)
+    //             scene.add(vetorVidas.at(i));
+    //     }
+    // }
 
 
 //Função que cria os tiros:
@@ -396,11 +443,14 @@ function checkCollisions(){
                 }
             }else{
                 if((tiro.bBox.intersectsBox(aviaoBB) || tiro.bBox.containsBox(aviaoBB)) && !modoInvencivel){
-                    if(tiro.terraAr)
-                        vidas = vidas - 2;
-                    else
+                    if(tiro.terraAr){
                         vidas--;
-                    console.log("vidas: " + vidas);
+                        perdeVida();
+                        vidas--;
+                        perdeVida();
+                    }else
+                        vidas--;
+                        perdeVida();
                     scene.remove(tiro.object);
                     vetorTiros.splice(indexBullet, 1);
                     if(vidas <= 0)
@@ -411,7 +461,10 @@ function checkCollisions(){
         });
         //Caso o avião esteja colidindo ou esteja dentro do inimigo, troca a variável booleana de animação do avião para 'true':
         if((inimigo.bBox.intersectsBox(aviaoBB) || inimigo.bBox.containsBox(aviaoBB)) && !modoInvencivel){
-            vidas = vidas - 2;
+            vidas--;
+            perdeVida();
+            vidas--;
+            perdeVida();
             console.log("vidas: " + vidas);
             if(vidas <= 0)
                 auxAnimationAviao = true;
@@ -434,6 +487,8 @@ function checkCollisions(){
     });
 }
 
+
+
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
 window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)}, false );
@@ -450,14 +505,16 @@ function render()
     if(y >= 99)
         createHealObject();
     //Chamada das funções no render:
-    enemyShoot();
+    //enemyShoot();
     moveObjects();
     atualizaBB();
     checkCollisions();
     keyboardUpdate();
     animationEnemy();
     animationAviao();
+    //resetaVidas();
     plane.translateY(-1);
+    controlledRender();
     requestAnimationFrame(render);
-    renderer.render(scene, camera) // Render scene
+    //renderer.render(scene, camera) // Render scene
 }

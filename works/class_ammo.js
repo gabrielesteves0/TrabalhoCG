@@ -27,7 +27,7 @@ class Ammo {
             this.inimigo = true;
         }else if(tipo == "ar-terra"){
             this.velocidadeY = -5;
-            this.velocidadeZ = -5;
+            this.velocidadeZ = -8;
         }else{
             this.velocidadeY = 3;
             this.velocidadeZ = 3;
