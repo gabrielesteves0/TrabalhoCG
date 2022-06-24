@@ -46,7 +46,7 @@ scene.add(cameraHolder);
 var virtualCamera = new THREE.PerspectiveCamera(45, 300/100, .1, 10);
   virtualCamera.position.set(0, -15, 0);
   virtualCamera.up.set(0, 1, 0);
-  virtualCamera.lookAt(0, 0, -20);
+  virtualCamera.lookAt(0, 0, -15);
 
 
 
@@ -63,12 +63,12 @@ function controlledRender(){
     renderer.render(scene, camera);   
 
     var offset = 30; 
-    renderer.setViewport(offset, height-100-offset, 300, 100);  // Set virtual camera viewport  
-    renderer.setScissor(offset, height-100-offset, 300, 100); // Set scissor with the same size as the viewport
-    renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
-    renderer.setClearColor("rgb(60, 50, 150)");  // Use a darker clear color in the small viewport 
-    renderer.clear(); // Clean the small viewport
-    renderer.render(scene, virtualCamera);  // Render scene of the virtual camera
+    renderer.setViewport(offset, height-100-offset, 300, 100);
+    renderer.setScissor(offset, height-100-offset, 300, 100);
+    renderer.setScissorTest(true);
+    renderer.setClearColor("rgb(80, 70, 170)");
+    renderer.clear();
+    renderer.render(scene, virtualCamera);
 }
 
 
@@ -194,15 +194,15 @@ for(let i = 0; i < 5; i++){
     let bolinha = new THREE.Mesh(new THREE.SphereGeometry(1.3, 32, 32), 
      new THREE.MeshLambertMaterial({color: 0xff0000}));
     if(i == 0)
-        bolinha.position.set(-6, -10, -7);
+        bolinha.position.set(-6, -8.6, -7);
     else if(i == 1)
-        bolinha.position.set(-3, -10, -7);
+        bolinha.position.set(-3, -8.6, -7);
     else if(i == 2)
-        bolinha.position.set(0, -10, -7);
+        bolinha.position.set(0, -8.6, -7);
     else if(i == 3)
-        bolinha.position.set(3, -10, -7);
+        bolinha.position.set(3, -8.6, -7);
     else
-        bolinha.position.set(6, -10, -7);
+        bolinha.position.set(6, -8.6, -7);
     //bolinha.position.set(0, -8.6, -7);
     scene.add(bolinha);
     vetorVidas.push(bolinha);
@@ -254,7 +254,7 @@ function createEnemies(){
 
     //vertical
     let enemy = new Enemies("vertical");
-    let positionX = (Math.random() * 185);
+    let positionX = (Math.random() * 175);
     let positionZ = -350;
     let sinal = Math.random()*2;
     if(sinal >= 1)
@@ -284,7 +284,7 @@ function createEnemies(){
 
     //terrestre
     let enemy2 = new Enemies("terrestre");
-    let positionX2 = (Math.random() * 185);
+    let positionX2 = (Math.random() * 175);
     let positionZ2 = -350;
     let sinal2 = Math.random()*2;
     if(sinal2 >= 1)
@@ -371,7 +371,7 @@ let vetorCuras = [];
 
 function createHealObject(){
     let cura = new Heal();
-    let posicaoX = Math.random()*185;
+    let posicaoX = Math.random()*175;
     let sinal = Math.random()*2;
     if(sinal > 1){
         posicaoX = posicaoX * (-1);
