@@ -12,6 +12,7 @@ import {initRenderer,
         degreesToRadians,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
+import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
@@ -58,16 +59,17 @@ function controlledRender(){
     // Set main viewport
     renderer.setViewport(0, 0, width, height); // Reset viewport    
     renderer.setScissorTest(false); // Disable scissor to paint the entire window
-    renderer.setClearColor("rgb(80, 70, 170)");    
+    renderer.setClearColor("rgb(80, 70, 170)");
     renderer.clear();   // Clean the window
-    renderer.render(scene, camera);   
+    renderer.render(scene, camera);
 
     var offset = 30; 
     renderer.setViewport(offset, height-100-offset, 300, 100);
     renderer.setScissor(offset, height-100-offset, 300, 100);
     renderer.setScissorTest(true);
     renderer.setClearColor("rgb(80, 70, 170)");
-    renderer.clear();
+    // renderer.clear();
+    renderer.autoClear = false;
     renderer.render(scene, virtualCamera);
 }
 
@@ -131,6 +133,7 @@ function keyboardUpdate(){
     if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
     if(keyboard.down("enter"))  resetaJogo();
 
+
 }
 
 
@@ -159,6 +162,9 @@ function resetaJogo(){
         });
     }
     plane.position.set(0, 0, -4000);
+    aviao.position.set(0, 50, 10);
+    vidas = 0;
+    resetaVidas();
 }
 
 var vetorTiros = [];
@@ -199,8 +205,21 @@ scene.add(plane);
 //                                  MODELAGEM E DINÂMICA:
 
 //Modelagem do avião:
+// let aviao;
+// let loader = new GLTFLoader();
+// loader.load('../works/assets/plane.glb', function(gltf){
+//     aviao = gltf.scene;
+//     aviao.traverse(function(child){
+//         if(child)
+//             child.castShadow = true;
+//     });
+//     scene.add(aviao);
+// }, null, null);
+
+
 let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
 aviao.rotateX(degreesToRadians(-90));
+aviao.translateY(50);
 aviao.position.set(0, 50, 10);
 scene.add(aviao);
 aviao.castShadow = true;
@@ -227,7 +246,6 @@ for(let i = 0; i < 5; i++){
         bolinha.position.set(3, -8.6, -7);
     else
         bolinha.position.set(6, -8.6, -7);
-    //bolinha.position.set(0, -8.6, -7);
     scene.add(bolinha);
     vetorVidas.push(bolinha);
 }
@@ -256,10 +274,12 @@ function createAmmo(tipo, target, distx, distz){
     aviao.updateMatrixWorld(true);
     if(tipo == "terra-ar"){
         tiro = new Ammo(tipo, distx, distz);
+        // tiro.object.rotateX(degreesToRadians(135));
         if(aviao.position.x < target.x)
             tiro.inverteVelocidadeX();
     }else
         tiro = new Ammo(tipo, 0, 0);
+        // tiro.object.rotateX(degreesToRadians(90));
     tiro.object.position.set(target.x, target.y, target.z);
     scene.add(tiro.object);
     vetorTiros.push(tiro);
@@ -275,7 +295,7 @@ function enemyShoot(){
             aviao.updateMatrixWorld(true);
             let pos = new THREE.Vector3();
             aviao.getWorldPosition(pos);
-            if(pos.z > posicaoInimigo.z){
+            if(posicaoInimigo.z < 10){
                 let distx = Math.abs(pos.x - item.object.position.x);
                 let distz = Math.abs(pos.z - item.object.position.z);
                 if(item.terrestre == true)
@@ -456,11 +476,6 @@ function moveObjects(){
         item.object.translateX(item.velocidadeX);
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
-        // let target = new THREE.Vector3(0, 0, 0);
-        // target = aviao.worldToLocal(item.object.position.clone());
-        // let dist = aviao.position.distanceTo(item.object.position)/1000;
-        // dist = dist*(-1);
-        // item.object.translateOnAxis(target, dist);
         item.object.updateMatrixWorld(true);
         if(item.object.position.y >= 50 && item.terraAr){
             item.resetVelocidadeY();

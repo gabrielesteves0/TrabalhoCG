@@ -1,10 +1,11 @@
 import * as THREE from "../build/three.module.js";
+import {degreesToRadians} from "../libs/util/util.js";
 
 class Ammo {
 
     bBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-    #geometry = new THREE.SphereGeometry(2, 16, 16);
-    #material = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
+    #geometry = new THREE.CylinderGeometry(.5, .5, 4, 16, 16);
+    #material = new THREE.MeshLambertMaterial( { color: 0xff0000 } ); // 0x008000
     object;
     velocidadeX;
     velocidadeY;
