@@ -111,6 +111,19 @@ function setDirectionalLighting(position)
   scene.add(dirLight);
 }
 
+let aviao;
+var mat4 = new THREE.Matrix4();
+let loader = new GLTFLoader();
+
+loader.load('../works/assets/plane.glb', function(glb){
+    aviao = glb.scene;
+    
+    aviao.traverse(function(child){
+        if(child)
+            child.castShadow = true;
+    });
+    scene.add(aviao);
+}, null, null);
 
 //Função KeyboardUpdate, para movimentação do avião:
 var keyboard = new KeyboardState();
@@ -118,10 +131,26 @@ var keyboard = new KeyboardState();
 function keyboardUpdate(){
     keyboard.update();
 
-    if(keyboard.pressed("up") && aviao.position.z >= -345)  aviao.translateY(2);
-    if(keyboard.pressed("down") && aviao.position.z <= 120) aviao.translateY(-2);
-    if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
-    if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
+    if(keyboard.pressed("up") /* && aviao.position.z >= -345 */){
+        aviao.matrixAutoUpdate = false;
+        aviao.matrix.identity();  
+        aviao.matrix.multiply(mat4.makeTranslation(0, 0, -2));
+    }
+    if(keyboard.pressed("down") /* && aviao.position.z <= 120 */){
+        aviao.matrixAutoUpdate = false;
+        aviao.matrix.identity();
+        aviao.matrix.multiply(mat4.makeTranslation(0, 0, 2));
+    }
+    if(keyboard.pressed("left") /* && aviao.position.x >= -190 */){  
+        aviao.matrixAutoUpdate = false;
+        aviao.matrix.identity();
+        aviao.matrix.multiply(mat4.makeTranslation(2, 0, 0));
+    }
+    if(keyboard.pressed("right") /* && aviao.position.x <= 190 */){
+        aviao.matrixAutoUpdate = false;
+        aviao.matrix.identity();  
+        aviao.matrix.multiply(mat4.makeTranslation(-2, 0, 0));
+    }
     if(keyboard.down("space")){
         aviao.getWorldPosition(posicaoAviao);
         createAmmo("ar-ar", posicaoAviao);
@@ -205,31 +234,20 @@ scene.add(plane);
 //                                  MODELAGEM E DINÂMICA:
 
 //Modelagem do avião:
-// let aviao;
-// let loader = new GLTFLoader();
-// loader.load('../works/assets/plane.glb', function(gltf){
-//     aviao = gltf.scene;
-//     aviao.traverse(function(child){
-//         if(child)
-//             child.castShadow = true;
-//     });
-//     scene.add(aviao);
-// }, null, null);
 
-
-let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
-aviao.rotateX(degreesToRadians(-90));
-aviao.translateY(50);
-aviao.position.set(0, 50, 10);
-scene.add(aviao);
-aviao.castShadow = true;
+// let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
+// aviao.rotateX(degreesToRadians(-90));
+// aviao.translateY(50);
+// aviao.position.set(0, 50, 10);
+// scene.add(aviao);
+// aviao.castShadow = true;
 let vidas = 5;
 let modoInvencivel = false;
 let auxAnimationAviao = false;
 
 let posicaoAviao = new THREE.Vector3(0,0,0);
 let aviaoBB = new THREE.Box3();
-aviao.geometry.computeBoundingBox(aviaoBB);
+// aviao.geometry.computeBoundingBox(aviaoBB);
 
 let vetorVidas = [];
 
@@ -410,7 +428,7 @@ function animationAviao(){
 
 //Função para atualizar a posição das Box3 dos elementos. Basicamente, com isto, as Bounding Boxes se movem junto com seus respectivos objetos.
 function atualizaBB(){
-    aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
+    // aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
     vetorInimigos.forEach(item => {
         item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
@@ -562,8 +580,6 @@ function checkCollisions(){
     });
 }
 
-
-
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
 window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)}, false );
@@ -580,13 +596,14 @@ function render()
     if(y >= 99)
         createHealObject();
     //Chamada das funções no render:
+ 
     enemyShoot();
     moveObjects();
     atualizaBB();
     checkCollisions();
     keyboardUpdate();
     animationEnemy();
-    animationAviao();
+    // animationAviao();
     resetaVidas();
     plane.translateY(-1);
     controlledRender();
