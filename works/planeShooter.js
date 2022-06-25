@@ -13,6 +13,7 @@ import {initRenderer,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
+import {FBXLoader} from '../build/jsm/loaders/FBXLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
@@ -111,19 +112,7 @@ function setDirectionalLighting(position)
   scene.add(dirLight);
 }
 
-let aviao;
-var mat4 = new THREE.Matrix4();
-let loader = new GLTFLoader();
 
-loader.load('../works/assets/plane.glb', function(glb){
-    aviao = glb.scene;
-    
-    aviao.traverse(function(child){
-        if(child)
-            child.castShadow = true;
-    });
-    scene.add(aviao);
-}, null, null);
 
 //Função KeyboardUpdate, para movimentação do avião:
 var keyboard = new KeyboardState();
@@ -131,26 +120,10 @@ var keyboard = new KeyboardState();
 function keyboardUpdate(){
     keyboard.update();
 
-    if(keyboard.pressed("up") /* && aviao.position.z >= -345 */){
-        aviao.matrixAutoUpdate = false;
-        aviao.matrix.identity();  
-        aviao.matrix.multiply(mat4.makeTranslation(0, 0, -2));
-    }
-    if(keyboard.pressed("down") /* && aviao.position.z <= 120 */){
-        aviao.matrixAutoUpdate = false;
-        aviao.matrix.identity();
-        aviao.matrix.multiply(mat4.makeTranslation(0, 0, 2));
-    }
-    if(keyboard.pressed("left") /* && aviao.position.x >= -190 */){  
-        aviao.matrixAutoUpdate = false;
-        aviao.matrix.identity();
-        aviao.matrix.multiply(mat4.makeTranslation(2, 0, 0));
-    }
-    if(keyboard.pressed("right") /* && aviao.position.x <= 190 */){
-        aviao.matrixAutoUpdate = false;
-        aviao.matrix.identity();  
-        aviao.matrix.multiply(mat4.makeTranslation(-2, 0, 0));
-    }
+    if(keyboard.pressed("up") && aviao.position.z >= -345)  aviao.translateY(2);
+    if(keyboard.pressed("down") && aviao.position.z <= 120) aviao.translateY(-2);
+    if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
+    if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
     if(keyboard.down("space")){
         aviao.getWorldPosition(posicaoAviao);
         createAmmo("ar-ar", posicaoAviao);
@@ -235,19 +208,43 @@ scene.add(plane);
 
 //Modelagem do avião:
 
-// let aviao = new THREE.Mesh(new THREE.ConeGeometry(2.5, 20, 32), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
-// aviao.rotateX(degreesToRadians(-90));
-// aviao.translateY(50);
-// aviao.position.set(0, 50, 10);
-// scene.add(aviao);
+
+
+let aviao = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 6), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
+aviao.rotateX(degreesToRadians(-90));
+aviao.translateY(50);
+aviao.position.set(0, 50, 10);
+scene.add(aviao);
 // aviao.castShadow = true;
 let vidas = 5;
 let modoInvencivel = false;
 let auxAnimationAviao = false;
+aviao.material.transparent = true;
+aviao.material.opacity = 0;
 
 let posicaoAviao = new THREE.Vector3(0,0,0);
 let aviaoBB = new THREE.Box3();
-// aviao.geometry.computeBoundingBox(aviaoBB);
+aviao.geometry.computeBoundingBox(aviaoBB);
+
+let modeloAviao;
+let loader = new GLTFLoader();
+
+loader.load('../works/assets/plane.glb', function(glb){
+    modeloAviao = glb.scene;
+    
+    modeloAviao.traverse(function(child){
+        if(child)
+            child.castShadow = true;
+    });
+    modeloAviao.scale.x += 2.3;
+    modeloAviao.scale.y += 2.3;
+    modeloAviao.scale.z += 2.3;
+    modeloAviao.rotation.x -= 1.6;
+    modeloAviao.rotation.z -= Math.PI;
+    modeloAviao.position.y -= 2;
+    modeloAviao.position.z -= 12;
+    aviao.add(modeloAviao);
+}, null, null);
 
 let vetorVidas = [];
 
@@ -329,28 +326,58 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    // let enemy = new Enemies("vertical");
-    // let positionX = (Math.random() * 175);
-    // let positionZ = -350;
-    // let sinal = Math.random()*2;
-    // if(sinal >= 1)
-    //     positionX = positionX * (-1);
+    let enemy = new Enemies("vertical", "helicopter");
+    let positionX = (Math.random() * 175);
+    let positionZ = -350;
+    let sinal = Math.random()*2;
+    if(sinal >= 1)
+        positionX = positionX * (-1);
     // enemy.object.position.set(positionX, 50, positionZ);
+    enemy.object.position.set(0, 20, 0);
+    enemy.object.material.transparent = true;
+    enemy.object.material.opacity = 0.3;
 
-    // vetorInimigos.push(enemy);
-    // scene.add(enemy.object);
+    vetorInimigos.push(enemy);
+    scene.add(enemy.object);
+
+    // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+    // setModeloInimigo('../works/assets/enemyPlane.fbx', enemy.object);
+    // setModeloInimigo('../works/assets/jetPlane.fbx', enemy.object);
+    setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
 
     //horizontal
-    // let enemy = new Enemies("horizontal");
+    // let enemy = new Enemies("horizontal", "jetPlane");
     // let positionX = -250;
     // let positionZ = Math.random()*100 * (-1);
     // enemy.object.position.set(positionX, 50, positionZ);
 
+    // enemy.object.material.transparent = true;
+    // enemy.object.material.opacity = 0;
+    // enemy.object.rotation.y += Math.PI/2;
+
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
+
+    // // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+    // setModeloInimigo('../works/assets/jetPlane.glb', enemy.object);
+
+
     //diagonal esquerda
-    // let enemy = new Enemies("diagonalEsquerda");
+    // let enemy = new Enemies("diagonalEsquerda", "jetPlane");
     // let positionX = -195;
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
+
+    // enemy.object.material.transparent = true;
+    // enemy.object.material.opacity = 0;
+    // enemy.object.rotation.y += 0.698132;
+
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
+
+    // // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+    // setModeloInimigo('../works/assets/jetPlane.glb', enemy.object);
+
 
     //diagonal direita
     // let enemy = new Enemies("diagonalDireita");
@@ -358,28 +385,112 @@ function createEnemies(){
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
 
+    // enemy.object.material.transparent = true;
+    // enemy.object.material.opacity = 0;
+    // enemy.object.rotation.y -= 0.698132;
+
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
+
+    // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+
     //terrestre
-    let enemy2 = new Enemies("terrestre");
-    let positionX2 = (Math.random() * 175);
-    let positionZ2 = -350;
-    let sinal2 = Math.random()*2;
-    if(sinal2 >= 1)
-        positionX2 = positionX2 * (-1);
-    enemy2.object.position.set(positionX2, 8, positionZ2);
-    enemy2.object.material.color.setHex(0xff0000); 
+    // let enemy2 = new Enemies("terrestre", "toonTank");
+    // let positionX2 = (Math.random() * 175);
+    // let positionZ2 = -350;
+    // let sinal2 = Math.random()*2;
+    // if(sinal2 >= 1)
+    //     positionX2 = positionX2 * (-1);
+    // enemy2.object.position.set(positionX2, 8, positionZ2);
+    // // enemy2.object.position.set(0, 20, 0);
+    // enemy2.object.material.transparent = true;
+    // enemy2.object.material.opacity = 0;
 
-    scene.add(enemy2.object);
-    vetorInimigos.push(enemy2);
+    // scene.add(enemy2.object);
+    // vetorInimigos.push(enemy2);
 
-    let enemy3 = new Enemies("meia-lua");
-    let positionX = -195;
-    let positionZ = -300;
-    enemy3.object.position.set(positionX, 50, positionZ);
-    enemy3.object.material.color.setHex(0xffffff); 
+    // setModeloInimigo('../works/assets/toonTank.glb', enemy2.object);
 
-    vetorInimigos.push(enemy3);
-    scene.add(enemy3.object);
+    //meia-lua
+    // let enemy3 = new Enemies("meia-lua");
+    // let positionX = -195;
+    // let positionZ = -300;
+    // enemy3.object.position.set(positionX, 50, positionZ);
 
+    // enemy3.object.material.transparent = true;
+    // enemy3.object.material.opacity = 0;
+
+    // vetorInimigos.push(enemy3);
+    // scene.add(enemy3.object);
+
+    // setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
+
+
+
+}
+
+function setModeloInimigo(modelo, objeto){
+    let modeloInimigo;
+    let loader = new GLTFLoader();
+    let loader2 = new FBXLoader();
+    if(modelo == '../works/assets/fighter.glb'){
+        loader.load(modelo, function(glb){
+            modeloInimigo = glb.scene;
+            
+            modeloInimigo.traverse(function(child){
+                if(child)
+                    child.castShadow = true;
+            });
+            modeloInimigo.scale.x += 2.6;
+            modeloInimigo.scale.y += 2.6;
+            modeloInimigo.scale.z += 2.6;
+            modeloInimigo.rotation.x -= 1.6;
+            modeloInimigo.rotation.z -= Math.PI;
+            objeto.add(modeloInimigo);
+        }, null, null);
+    }else if(modelo == '../works/assets/helicopter.fbx'){
+        loader2.load(modelo, function(fbx){
+            modeloInimigo = fbx.scene;
+            
+            modeloInimigo.traverse(function(child){
+                if(child)
+                    child.castShadow = true;
+            });
+            modeloInimigo.scale.x += 1.2;
+            modeloInimigo.scale.y += 1.2;
+            modeloInimigo.scale.z += 1.2;
+            modeloInimigo.rotation.y += Math.PI/2;
+            objeto.add(modeloInimigo);
+        }, null, null);
+    }else if(modelo == '../works/assets/enemyPlane.fbx'){
+        loader2.load(modelo, function(fbx){
+            modeloInimigo = fbx.scene;
+            
+            modeloInimigo.traverse(function(child){
+                if(child)
+                    child.castShadow = true;
+            });
+            modeloInimigo.scale.x += 2.3;
+            modeloInimigo.scale.y += 2.3;
+            modeloInimigo.scale.z += 2.3;
+            modeloInimigo.position.y -= 4;
+            objeto.add(modeloInimigo);
+        }, null, null);
+    }else{
+        loader2.load(modelo, function(fbx){
+            modeloInimigo = fbx.scene;
+            
+            modeloInimigo.traverse(function(child){
+                if(child)
+                    child.castShadow = true;
+            });
+            modeloInimigo.scale.x += 16;
+            modeloInimigo.scale.y += 16;
+            modeloInimigo.scale.z += 16;
+            objeto.add(modeloInimigo);
+        }, null, null);
+    }
+    
 }
 
 
@@ -437,7 +548,7 @@ function animationAviao(){
 
 //Função para atualizar a posição das Box3 dos elementos. Basicamente, com isto, as Bounding Boxes se movem junto com seus respectivos objetos.
 function atualizaBB(){
-    // aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
+    aviaoBB.copy(aviao.geometry.boundingBox).applyMatrix4(aviao.matrixWorld);
 
     vetorInimigos.forEach(item => {
         item.bBox.copy(item.object.geometry.boundingBox).applyMatrix4(item.object.matrixWorld);
@@ -590,6 +701,8 @@ function checkCollisions(){
     });
 }
 
+createEnemies();
+
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
 window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)}, false );
@@ -598,25 +711,26 @@ render();
 function render()
 {
     //Criação de um numero aleatório entre 0 e 100:
-    let x = Math.random()*100;
-    //Caso seja maior que 95, cria um inimigo aleatoriamente:
-    if(x >= 98.5)
-        createEnemies();
-    let y = Math.random()*100;
-    if(y >= 99)
-        createHealObject();
-    //Chamada das funções no render:
+    // let x = Math.random()*100;
+    // //Caso seja maior que 95, cria um inimigo aleatoriamente:
+    // if(x >= 98.5)
+    //     createEnemies();
+    // let y = Math.random()*100;
+    // if(y >= 99)
+    //     createHealObject();
+    // //Chamada das funções no render:
  
-    enemyShoot();
-    moveObjects();
-    atualizaBB();
-    checkCollisions();
+    // enemyShoot();
+    // moveObjects();
+    // atualizaBB();
+    // checkCollisions();
     keyboardUpdate();
-    animationEnemy();
+    // animationEnemy();
     // animationAviao();
-    resetaVidas();
-    plane.translateY(-1);
+    // resetaVidas();
+    // plane.translateY(-1);
     controlledRender();
+    trackballControls.update();
     requestAnimationFrame(render);
     //renderer.render(scene, camera) // Render scene
 }

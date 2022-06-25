@@ -1,4 +1,5 @@
 import * as THREE from "../build/three.module.js";
+import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 
 class Enemies {
 
@@ -10,20 +11,31 @@ class Enemies {
     velocidadeZ;
     terrestre = false;
     meiaLua = false;
-    constructor(movimento){
+    constructor(movimento, modelo){
+        if(modelo == "fighter"){
+            this.#geometry = new THREE.BoxGeometry(20, 10, 10);
+        }else if(modelo == "jetPlane"){
+            this.#geometry = new THREE.BoxGeometry(20, 10, 26);
+        }else if(modelo == "toonTank"){
+            this.#geometry = new THREE.BoxGeometry(12, 9, 11);
+        }else if(modelo == "helicopter"){
+            this.#geometry = new THREE.BoxGeometry(22, 9, 22);
+        }else{
+            
+        }
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.object.geometry.computeBoundingBox();
         this.bBox.copy(this.object.geometry.boundingBox).applyMatrix4(this.object.matrixWorld);
-        this.object.castShadow = true;
+        // this.object.castShadow = true;
         if(movimento == "diagonalEsquerda"){
-            this.velocidadeX = 2.5;
+            this.velocidadeX = 0; //2.5
             this.velocidadeZ = 3;
         }else if(movimento == "diagonalDireita"){
-            this.velocidadeX = -2.5;
+            this.velocidadeX = 0; //-2.5
             this.velocidadeZ = 3;
         }else if(movimento == "horizontal"){
-            this.velocidadeX = (Math.random()*2) + 2;
-            this.velocidadeZ = 0;
+            this.velocidadeZ = (Math.random()*2) + 2;
+            this.velocidadeX = 0;
         }else if(movimento == "vertical"){
             this.velocidadeX = 0;
             this.velocidadeZ = (Math.random()*5) + 1;
@@ -36,6 +48,7 @@ class Enemies {
             this.velocidadeZ = 3;
             this.meiaLua = true;
         }
+
     }
 
     atualizacaoVelocidadeMeiaLua(posX){
@@ -43,6 +56,7 @@ class Enemies {
             this.velocidadeZ -= .02;
         else
             this.velocidadeZ -= .08;
+        this.object.rotation.y += 0.001;
     }
 
 }

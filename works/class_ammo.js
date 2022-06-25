@@ -4,7 +4,7 @@ import {degreesToRadians} from "../libs/util/util.js";
 class Ammo {
 
     bBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-    #geometry = new THREE.CylinderGeometry(.5, .5, 4, 16, 16);
+    #geometry = new THREE.SphereGeometry(2, 32, 32);
     #material = new THREE.MeshLambertMaterial( { color: 0xff0000 } ); // 0x008000
     object;
     velocidadeX;
