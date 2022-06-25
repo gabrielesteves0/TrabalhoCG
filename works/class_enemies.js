@@ -9,6 +9,7 @@ class Enemies {
     velocidadeX;
     velocidadeZ;
     terrestre = false;
+    meiaLua = false;
     constructor(movimento){
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.object.geometry.computeBoundingBox();
@@ -26,11 +27,23 @@ class Enemies {
         }else if(movimento == "vertical"){
             this.velocidadeX = 0;
             this.velocidadeZ = (Math.random()*5) + 1;
-        }else{
+        }else if(movimento == "terrestre"){
             this.velocidadeX = 0;
             this.velocidadeZ = (Math.random()*5) + 1;
             this.terrestre = true;
+        }else{
+            this.velocidadeX = 2;
+            this.velocidadeZ = 3;
+            this.meiaLua = true;
         }
     }
+
+    atualizacaoVelocidadeMeiaLua(posX){
+        if(posX < 0)
+            this.velocidadeZ -= .02;
+        else
+            this.velocidadeZ -= .08;
+    }
+
 }
 export default Enemies;
