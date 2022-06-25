@@ -327,23 +327,23 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    // let enemy = new Enemies("vertical", "cartoonPlane");
-    // let positionX = (Math.random() * 175);
-    // let positionZ = -350;
-    // let sinal = Math.random()*2;
-    // if(sinal >= 1)
-    //     positionX = positionX * (-1);
-    // // enemy.object.position.set(positionX, 50, positionZ);
+    let enemy = new Enemies("vertical", "enemyPlane");
+    let positionX = (Math.random() * 175);
+    let positionZ = -350;
+    let sinal = Math.random()*2;
+    if(sinal >= 1)
+        positionX = positionX * (-1);
+    enemy.object.position.set(positionX, 50, positionZ);
     // enemy.object.position.set(0, 20, 0);
-    // enemy.object.material.transparent = true;
-    // enemy.object.material.opacity = 0.3;
+    enemy.object.material.transparent = true;
+    enemy.object.material.opacity = 0;
 
-    // vetorInimigos.push(enemy);
-    // scene.add(enemy.object);
+    vetorInimigos.push(enemy);
+    scene.add(enemy.object);
 
     // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
     // setModeloInimigo('../works/assets/cartoonPlane/scene.gltf', enemy.object);
-    // setModeloInimigo('../works/assets/pixelPlane/scene.gltf', enemy.object);
+    setModeloInimigo('../works/assets/enemyPlane/scene.gltf', enemy.object);
     // setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
 
     //horizontal
@@ -411,18 +411,18 @@ function createEnemies(){
     // setModeloInimigo('../works/assets/toonTank.glb', enemy2.object);
 
     //meia-lua
-    let enemy3 = new Enemies("meia-lua", "fighter");
-    let positionX = -195;
-    let positionZ = -300;
-    enemy3.object.position.set(positionX, 50, positionZ);
+    // let enemy3 = new Enemies("meia-lua", "fighter");
+    // let positionX = -195;
+    // let positionZ = -300;
+    // enemy3.object.position.set(positionX, 50, positionZ);
 
-    enemy3.object.material.transparent = true;
-    enemy3.object.material.opacity = 0;
+    // enemy3.object.material.transparent = true;
+    // enemy3.object.material.opacity = 0;
 
-    vetorInimigos.push(enemy3);
-    scene.add(enemy3.object);
+    // vetorInimigos.push(enemy3);
+    // scene.add(enemy3.object);
 
-    setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
+    // setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
 }
 
 function setModeloInimigo(modelo, objeto){
@@ -457,7 +457,7 @@ function setModeloInimigo(modelo, objeto){
             // modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
-    }else if(modelo == '../works/assets/pixelPlane/scene.gltf'){
+    }else if(modelo == '../works/assets/enemyPlane/scene.gltf'){
         loader.load(modelo, function(gltf){
             modeloInimigo = gltf.scene;
             
@@ -465,11 +465,9 @@ function setModeloInimigo(modelo, objeto){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x -= 2.6;
-            modeloInimigo.scale.y -= 2.6;
-            modeloInimigo.scale.z -= 2.6;
-            // modeloInimigo.rotation.x -= 1.6;
-            // modeloInimigo.rotation.z -= Math.PI;
+            modeloInimigo.scale.x -= .6;
+            modeloInimigo.scale.y -= .6;
+            modeloInimigo.scale.z -= .6;
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
@@ -699,7 +697,7 @@ function checkCollisions(){
     });
 }
 
-createEnemies();
+// createEnemies();
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 

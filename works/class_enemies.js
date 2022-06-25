@@ -18,10 +18,8 @@ class Enemies {
             this.#geometry = new THREE.BoxGeometry(20, 7, 20);
         }else if(modelo == "toonTank"){
             this.#geometry = new THREE.BoxGeometry(12, 9, 11);
-        }else if(modelo == "pixelPlane"){
-            this.#geometry = new THREE.BoxGeometry(22, 9, 22);
         }else{
-            
+            this.#geometry = new THREE.BoxGeometry(22, 9, 22);
         }
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.object.geometry.computeBoundingBox();
