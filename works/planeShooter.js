@@ -326,7 +326,7 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    let enemy = new Enemies("vertical", "helicopter");
+    let enemy = new Enemies("vertical", "fighter");
     let positionX = (Math.random() * 175);
     let positionZ = -350;
     let sinal = Math.random()*2;
@@ -340,13 +340,13 @@ function createEnemies(){
     vetorInimigos.push(enemy);
     scene.add(enemy.object);
 
-    // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+    setModeloInimigo('../works/assets/fighter.glb', enemy.object);
     // setModeloInimigo('../works/assets/enemyPlane.fbx', enemy.object);
     // setModeloInimigo('../works/assets/jetPlane.fbx', enemy.object);
-    setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
+    // setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
 
     //horizontal
-    // let enemy = new Enemies("horizontal", "jetPlane");
+    // let enemy = new Enemies("horizontal", "fighter");
     // let positionX = -250;
     // let positionZ = Math.random()*100 * (-1);
     // enemy.object.position.set(positionX, 50, positionZ);
@@ -359,11 +359,10 @@ function createEnemies(){
     // scene.add(enemy.object);
 
     // // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
-    // setModeloInimigo('../works/assets/jetPlane.glb', enemy.object);
 
 
     //diagonal esquerda
-    // let enemy = new Enemies("diagonalEsquerda", "jetPlane");
+    // let enemy = new Enemies("diagonalEsquerda", "fighter");
     // let positionX = -195;
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
@@ -375,12 +374,11 @@ function createEnemies(){
     // vetorInimigos.push(enemy);
     // scene.add(enemy.object);
 
-    // // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
-    // setModeloInimigo('../works/assets/jetPlane.glb', enemy.object);
+    // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
 
 
     //diagonal direita
-    // let enemy = new Enemies("diagonalDireita");
+    // let enemy = new Enemies("diagonalDireita", "fighter");
     // let positionX = 195;
     // let positionZ = -300;
     // enemy.object.position.set(positionX, 50, positionZ);
@@ -412,7 +410,7 @@ function createEnemies(){
     // setModeloInimigo('../works/assets/toonTank.glb', enemy2.object);
 
     //meia-lua
-    // let enemy3 = new Enemies("meia-lua");
+    // let enemy3 = new Enemies("meia-lua", "fighter");
     // let positionX = -195;
     // let positionZ = -300;
     // enemy3.object.position.set(positionX, 50, positionZ);
@@ -449,7 +447,7 @@ function setModeloInimigo(modelo, objeto){
             objeto.add(modeloInimigo);
         }, null, null);
     }else if(modelo == '../works/assets/helicopter.fbx'){
-        loader2.load(modelo, function(fbx){
+        loader2.load(modelo, (object) => {
             modeloInimigo = fbx.scene;
             
             modeloInimigo.traverse(function(child){
@@ -701,7 +699,7 @@ function checkCollisions(){
     });
 }
 
-createEnemies();
+// createEnemies();
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
@@ -711,24 +709,24 @@ render();
 function render()
 {
     //Criação de um numero aleatório entre 0 e 100:
-    // let x = Math.random()*100;
-    // //Caso seja maior que 95, cria um inimigo aleatoriamente:
-    // if(x >= 98.5)
-    //     createEnemies();
-    // let y = Math.random()*100;
-    // if(y >= 99)
-    //     createHealObject();
-    // //Chamada das funções no render:
+    let x = Math.random()*100;
+    //Caso seja maior que 95, cria um inimigo aleatoriamente:
+    if(x >= 98.5)
+        createEnemies();
+    let y = Math.random()*100;
+    if(y >= 99)
+        createHealObject();
+    //Chamada das funções no render:
  
-    // enemyShoot();
-    // moveObjects();
-    // atualizaBB();
-    // checkCollisions();
+    enemyShoot();
+    moveObjects();
+    atualizaBB();
+    checkCollisions();
     keyboardUpdate();
-    // animationEnemy();
-    // animationAviao();
-    // resetaVidas();
-    // plane.translateY(-1);
+    animationEnemy();
+    animationAviao();
+    resetaVidas();
+    plane.translateY(-1);
     controlledRender();
     trackballControls.update();
     requestAnimationFrame(render);
