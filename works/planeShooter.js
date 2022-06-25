@@ -205,15 +205,16 @@ scene.add(plane);
 //                                  MODELAGEM E DINÂMICA:
 
 //Modelagem do avião:
-// let aviao;
+// let modeloAviao;
 // let loader = new GLTFLoader();
-// loader.load('../works/assets/plane.glb', function(gltf){
-//     aviao = gltf.scene;
+// loader.load('../works/assets/plane.glb', function(glb){
+//     modeloAviao = glb.scene;
 //     aviao.traverse(function(child){
 //         if(child)
 //             child.castShadow = true;
 //     });
-//     scene.add(aviao);
+//     modeloAviao.scene.scale.set(2, 2, 2);
+//     scene.add(modeloAviao);
 // }, null, null);
 
 
@@ -311,16 +312,16 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    let enemy = new Enemies("vertical");
-    let positionX = (Math.random() * 175);
-    let positionZ = -350;
-    let sinal = Math.random()*2;
-    if(sinal >= 1)
-        positionX = positionX * (-1);
-    enemy.object.position.set(positionX, 50, positionZ);
+    // let enemy = new Enemies("vertical");
+    // let positionX = (Math.random() * 175);
+    // let positionZ = -350;
+    // let sinal = Math.random()*2;
+    // if(sinal >= 1)
+    //     positionX = positionX * (-1);
+    // enemy.object.position.set(positionX, 50, positionZ);
 
-    vetorInimigos.push(enemy);
-    scene.add(enemy.object);
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
 
     //horizontal
     // let enemy = new Enemies("horizontal");
@@ -352,6 +353,15 @@ function createEnemies(){
 
     scene.add(enemy2.object);
     vetorInimigos.push(enemy2);
+
+    let enemy3 = new Enemies("meia-lua");
+    let positionX = -195;
+    let positionZ = -300;
+    enemy3.object.position.set(positionX, 50, positionZ);
+    enemy3.object.material.color.setHex(0xffffff); 
+
+    vetorInimigos.push(enemy3);
+    scene.add(enemy3.object);
 
 }
 
@@ -437,7 +447,6 @@ function createHealObject(){
     cura.object.translateZ(-300);
     cura.object.translateY(50);
     cura.object.translateX(posicaoX);
-    //cura.object.position.set(posicaoX, 50, -300);
     scene.add(cura.object);
     vetorCuras.push(cura);
 }
@@ -463,6 +472,8 @@ function moveObjects(){
         item.object.translateX(item.velocidadeX);
         //Atualiza sua posição em relação ao mundo:
         item.object.updateMatrixWorld(true);
+        if(item.meiaLua == true )
+            item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
         //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
         if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
             scene.remove(item.object);
