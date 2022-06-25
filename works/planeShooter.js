@@ -18,7 +18,8 @@ import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
 
-
+const stats = new Stats();
+document.getElementById("webgl-output").appendChild(stats.domElement);
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils
     renderer.shadowMap.enabled = true;
@@ -326,23 +327,23 @@ function enemyShoot(){
 function createEnemies(){
 
     //vertical
-    let enemy = new Enemies("vertical", "fighter");
-    let positionX = (Math.random() * 175);
-    let positionZ = -350;
-    let sinal = Math.random()*2;
-    if(sinal >= 1)
-        positionX = positionX * (-1);
-    // enemy.object.position.set(positionX, 50, positionZ);
-    enemy.object.position.set(0, 20, 0);
-    enemy.object.material.transparent = true;
-    enemy.object.material.opacity = 0.3;
+    // let enemy = new Enemies("vertical", "cartoonPlane");
+    // let positionX = (Math.random() * 175);
+    // let positionZ = -350;
+    // let sinal = Math.random()*2;
+    // if(sinal >= 1)
+    //     positionX = positionX * (-1);
+    // // enemy.object.position.set(positionX, 50, positionZ);
+    // enemy.object.position.set(0, 20, 0);
+    // enemy.object.material.transparent = true;
+    // enemy.object.material.opacity = 0.3;
 
-    vetorInimigos.push(enemy);
-    scene.add(enemy.object);
+    // vetorInimigos.push(enemy);
+    // scene.add(enemy.object);
 
-    setModeloInimigo('../works/assets/fighter.glb', enemy.object);
-    // setModeloInimigo('../works/assets/enemyPlane.fbx', enemy.object);
-    // setModeloInimigo('../works/assets/jetPlane.fbx', enemy.object);
+    // setModeloInimigo('../works/assets/fighter.glb', enemy.object);
+    // setModeloInimigo('../works/assets/cartoonPlane/scene.gltf', enemy.object);
+    // setModeloInimigo('../works/assets/pixelPlane/scene.gltf', enemy.object);
     // setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
 
     //horizontal
@@ -410,27 +411,23 @@ function createEnemies(){
     // setModeloInimigo('../works/assets/toonTank.glb', enemy2.object);
 
     //meia-lua
-    // let enemy3 = new Enemies("meia-lua", "fighter");
-    // let positionX = -195;
-    // let positionZ = -300;
-    // enemy3.object.position.set(positionX, 50, positionZ);
+    let enemy3 = new Enemies("meia-lua", "fighter");
+    let positionX = -195;
+    let positionZ = -300;
+    enemy3.object.position.set(positionX, 50, positionZ);
 
-    // enemy3.object.material.transparent = true;
-    // enemy3.object.material.opacity = 0;
+    enemy3.object.material.transparent = true;
+    enemy3.object.material.opacity = 0;
 
-    // vetorInimigos.push(enemy3);
-    // scene.add(enemy3.object);
+    vetorInimigos.push(enemy3);
+    scene.add(enemy3.object);
 
-    // setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
-
-
-
+    setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
 }
 
 function setModeloInimigo(modelo, objeto){
     let modeloInimigo;
     let loader = new GLTFLoader();
-    let loader2 = new FBXLoader();
     if(modelo == '../works/assets/fighter.glb'){
         loader.load(modelo, function(glb){
             modeloInimigo = glb.scene;
@@ -446,45 +443,48 @@ function setModeloInimigo(modelo, objeto){
             modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
-    }else if(modelo == '../works/assets/helicopter.fbx'){
-        loader2.load(modelo, (object) => {
-            modeloInimigo = fbx.scene;
+    }else if(modelo == '../works/assets/cartoonPlane/scene.gltf'){
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 1.2;
-            modeloInimigo.scale.y += 1.2;
-            modeloInimigo.scale.z += 1.2;
-            modeloInimigo.rotation.y += Math.PI/2;
+            modeloInimigo.scale.x += 9;
+            modeloInimigo.scale.y += 9;
+            modeloInimigo.scale.z += 9;
+            // modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
-    }else if(modelo == '../works/assets/enemyPlane.fbx'){
-        loader2.load(modelo, function(fbx){
-            modeloInimigo = fbx.scene;
+    }else if(modelo == '../works/assets/pixelPlane/scene.gltf'){
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 2.3;
-            modeloInimigo.scale.y += 2.3;
-            modeloInimigo.scale.z += 2.3;
-            modeloInimigo.position.y -= 4;
+            modeloInimigo.scale.x -= 2.6;
+            modeloInimigo.scale.y -= 2.6;
+            modeloInimigo.scale.z -= 2.6;
+            // modeloInimigo.rotation.x -= 1.6;
+            // modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
-        loader2.load(modelo, function(fbx){
-            modeloInimigo = fbx.scene;
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 16;
-            modeloInimigo.scale.y += 16;
-            modeloInimigo.scale.z += 16;
+            modeloInimigo.scale.x += 2.6;
+            modeloInimigo.scale.y += 2.6;
+            modeloInimigo.scale.z += 2.6;
+            modeloInimigo.rotation.x -= 1.6;
+            modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
     }
@@ -598,7 +598,7 @@ function moveObjects(){
         item.object.translateX(item.velocidadeX);
         //Atualiza sua posição em relação ao mundo:
         item.object.updateMatrixWorld(true);
-        if(item.meiaLua == true )
+        if(item.meiaLua == true)
             item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
         //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
         if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
@@ -699,7 +699,7 @@ function checkCollisions(){
     });
 }
 
-// createEnemies();
+createEnemies();
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
 
@@ -728,7 +728,7 @@ function render()
     resetaVidas();
     plane.translateY(-1);
     controlledRender();
+    stats.update();
     trackballControls.update();
     requestAnimationFrame(render);
-    //renderer.render(scene, camera) // Render scene
 }
