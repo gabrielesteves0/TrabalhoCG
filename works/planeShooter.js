@@ -788,7 +788,6 @@ function render()
     referenceObject.translateY(1); 
     if(referenceObject.position.y >= 6900)
         resetaJogo();
-    console.log(referenceObject.position.y);
     enemiesCreation();
 
     //Gera os itens de cura aleatoriamente
