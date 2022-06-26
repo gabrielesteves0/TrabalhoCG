@@ -18,6 +18,10 @@ import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
 
+// Status (FPS)
+const stats = new Stats();
+document.getElementById("webgl-output").appendChild(stats.domElement);
+
 var scene = new THREE.Scene();    // Create main scene
 var renderer = new THREE.WebGLRenderer();    // View function in util/utils
     renderer.shadowMap.enabled = true;
@@ -27,6 +31,7 @@ var renderer = new THREE.WebGLRenderer();    // View function in util/utils
     document.getElementById("webgl-output").appendChild(renderer.domElement);
 
 //                                  MOVIMENTAÇÃO E CÂMERA:
+
 
 //Função KeyboardUpdate, para movimentação do avião:
 var keyboard = new KeyboardState();
