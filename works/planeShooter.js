@@ -45,11 +45,11 @@ function keyboardUpdate(){
     if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
     if(keyboard.down("space")){
         aviao.getWorldPosition(posicaoAviao);
-        createAmmo("ar-ar", posicaoAviao);
+        createAmmo("ar-ar", posicaoAviao, 0, 0);
     }
     if(keyboard.down("ctrl")){
         aviao.getWorldPosition(posicaoAviao);
-        createAmmo("ar-terra", posicaoAviao);
+        createAmmo("ar-terra", posicaoAviao, 0, 0);
     }
     if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
     if(keyboard.down("enter"))  resetaJogo();
@@ -273,10 +273,25 @@ function createHealObject(){
 
 //Função que cria os inimigos
 function createEnemies(move){
+    //Definição dos modelos dos inimigos aéreos aleatória:
+    let defModelos = Math.random()*100;
+    let modelo;
+    let pathModelo;
+    if(defModelos <= 45){
+        modelo = "fighter";
+        pathModelo = '../works/assets/fighter.glb';
+    }else if(defModelos > 45 && defModelos <= 75){
+        modelo = "cartoonPlane";
+        pathModelo = '../works/assets/cartoonPlane/scene.gltf';
+    }else{
+        modelo = "enemyPlane";
+        pathModelo = '../works/assets/enemyPlane/scene.gltf';
+    }
+
     //vertical
     if(move == "vertical")
     {
-        let enemy1 = new Enemies(move, "fighter");
+        let enemy1 = new Enemies(move, modelo);
         let positionX1 = (Math.random() * 175);
         let positionZ1 = -350;
         let sinal1 = Math.random()*2;
@@ -284,10 +299,10 @@ function createEnemies(move){
             positionX1 = positionX1 * (-1);
         enemy1.object.position.set(positionX1, 50, positionZ1);
         enemy1.object.material.transparent = true;
-        enemy1.object.material.opacity = 0.3;
+        enemy1.object.material.opacity = 0;
         vetorInimigos.push(enemy1);
         scene.add(enemy1.object);
-        setModeloInimigo('../works/assets/fighter.glb', enemy1.object);
+        setModeloInimigo(pathModelo, enemy1.object);
     }
     // setModeloInimigo('../works/assets/enemyPlane.fbx', enemy.object);
     // setModeloInimigo('../works/assets/jetPlane.fbx', enemy.object);
@@ -296,7 +311,7 @@ function createEnemies(move){
     // horizontal
     if(move == "horizontal")
     {
-        let enemy2 = new Enemies(move, "fighter");
+        let enemy2 = new Enemies(move, modelo);
         let positionX2 = -250;
         let positionZ2 = Math.random()*200;
         let sinal2 = Math.random()*2;
@@ -308,43 +323,43 @@ function createEnemies(move){
         enemy2.object.rotation.y += Math.PI/2;
         vetorInimigos.push(enemy2);
         scene.add(enemy2.object);
-        setModeloInimigo('../works/assets/fighter.glb', enemy2.object);
+        setModeloInimigo(pathModelo, enemy2.object);
     }
 
     // diagonal esquerda
     if(move == "diagonalEsquerda")
     {
-        let enemy3 = new Enemies(move, "fighter");
+        let enemy3 = new Enemies(move, modelo);
         let positionX3 = -195;
         let positionZ3 = -300;
         enemy3.object.position.set(positionX3, 50, positionZ3);
         enemy3.object.material.transparent = true;
         enemy3.object.material.opacity = 0;
-        enemy3.object.rotation.y += 0.698132;
+        enemy3.object.rotation.y += 0.698132; // 40 graus em radianos
         vetorInimigos.push(enemy3);
         scene.add(enemy3.object);
-        setModeloInimigo('../works/assets/fighter.glb', enemy3.object);
+        setModeloInimigo(pathModelo, enemy3.object);
     }
 
     // diagonal direita
     if(move == "diagonalDireita")
     {
-        let enemy4 = new Enemies(move, "fighter");
+        let enemy4 = new Enemies(move, modelo);
         let positionX4 = 195;
         let positionZ4 = -300;
         enemy4.object.position.set(positionX4, 50, positionZ4);
         enemy4.object.material.transparent = true;
         enemy4.object.material.opacity = 0;
-        enemy4.object.rotation.y -= 0.698132;
+        enemy4.object.rotation.y -= 0.698132; // 40 graus em radianos
         vetorInimigos.push(enemy4);
         scene.add(enemy4.object);
-        setModeloInimigo('../works/assets/fighter.glb', enemy4.object);
+        setModeloInimigo(pathModelo, enemy4.object);
     }
 
     // terrestre
     if(move == "terrestre")
     {
-        let enemy5 = new Enemies(move, "fighter");
+        let enemy5 = new Enemies(move, "toonTank");
         let positionX5 = (Math.random() * 175);
         let positionZ5 = -350;
         let sinal3 = Math.random()*2;
@@ -355,13 +370,13 @@ function createEnemies(move){
         enemy5.object.material.opacity = 0;
         scene.add(enemy5.object);
         vetorInimigos.push(enemy5);
-        setModeloInimigo('../works/assets/fighter.glb', enemy5.object);
+        setModeloInimigo('../works/assets/toonTank.glb', enemy5.object);
     }
 
     // meia-lua
     if(move == "meia-lua")
     {
-        let enemy6 = new Enemies(move, "fighter");
+        let enemy6 = new Enemies(move, modelo);
         let positionX6 = -195;
         let positionZ6 = -300;
         enemy6.object.position.set(positionX6, 50, positionZ6);
@@ -369,7 +384,7 @@ function createEnemies(move){
         enemy6.object.material.opacity = 0;
         vetorInimigos.push(enemy6);
         scene.add(enemy6.object);
-        setModeloInimigo('../works/assets/fighter.glb', enemy6.object);
+        setModeloInimigo(pathModelo, enemy6.object);
     }
 }
 
@@ -379,7 +394,8 @@ function setModeloInimigo(modelo, objeto){
     let loader = new GLTFLoader();
     if(modelo == '../works/assets/fighter.glb'){
         loader.load(modelo, function(glb){
-            modeloInimigo = glb.scene;            
+            modeloInimigo = glb.scene;
+            
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
@@ -402,12 +418,12 @@ function setModeloInimigo(modelo, objeto){
             modeloInimigo.scale.x += 9;
             modeloInimigo.scale.y += 9;
             modeloInimigo.scale.z += 9;
-            // modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
-    }else if(modelo == '../works/assets/enemyPlane.fbx'){
-        loader2.load(modelo, function(fbx){
-            modeloInimigo = fbx.scene;            
+    }else if(modelo == '../works/assets/enemyPlane/scene.gltf'){
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
+            
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
@@ -418,20 +434,20 @@ function setModeloInimigo(modelo, objeto){
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
-        loader2.load(modelo, function(fbx){
-            modeloInimigo = fbx.scene;            
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
+            
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 2.6;
-            modeloInimigo.scale.y += 2.6;
-            modeloInimigo.scale.z += 2.6;
-            modeloInimigo.rotation.x -= 1.6;
-            modeloInimigo.rotation.z -= Math.PI;
+            modeloInimigo.scale.x += 2.9;
+            modeloInimigo.scale.y += 2.9;
+            modeloInimigo.scale.z += 2.9;
             objeto.add(modeloInimigo);
         }, null, null);
-    }    
+    }
+    
 }
 
 //                                   MECÂNICAS | UTILITIES
@@ -476,6 +492,7 @@ function resetaJogo(){
         }
         plane.position.set(0, 0, -4000);
         aviao.position.set(0, 50, 110);
+        referenceObject.position.set(0, 0, 0);
         vidas = 0;
         resetaVidas();
     }
@@ -532,19 +549,18 @@ window.addEventListener( 'resize', function(){onWindowResize(camera, renderer)},
 let referenceObject = new THREE.Object3D();
 let x;
 let y; 
-referenceObject.position.set(0, -50, 0);
-scene.add(referenceObject);
+referenceObject.position.set(0, 0, 0);
 
 //Função que cria os tiros:
 function createAmmo(tipo, target, distx, distz){
     let tiro;
     aviao.updateMatrixWorld(true);
-    if(tipo == "terra-ar"){
+    if(tipo != "ar-ar" && tipo != "ar-terra"){
         tiro = new Ammo(tipo, distx, distz);
-        if(aviao.position.x < target.x)
+        if(aviao.position.x < target.x && tipo != "horizontal")
             tiro.inverteVelocidadeX();
     }else
-        tiro = new Ammo(tipo, 0, 0);
+        tiro = new Ammo(tipo, distx, distz);
     tiro.object.position.set(target.x, target.y, target.z);
     scene.add(tiro.object);
     vetorTiros.push(tiro);
@@ -564,10 +580,12 @@ function enemyShoot(){
             if(posicaoInimigo.z < 10){
                 let distx = Math.abs(pos.x - item.object.position.x);
                 let distz = Math.abs(pos.z - item.object.position.z);
-                if(item.terrestre == true)
+                if(item.terrestre)
                     createAmmo("terra-ar", posicaoInimigo, distx, distz);
+                else if(item.horizontal)
+                    createAmmo("horizontal", posicaoInimigo, distx, distz);
                 else
-                    createAmmo("inimigo", posicaoInimigo, 0, 0);
+                    createAmmo("inimigo", posicaoInimigo, distx, distz);
             }
         }
     });
@@ -679,13 +697,26 @@ function enemiesCreation()
  }
  else 
  {
-     x = Math.random()*100;
-     //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 99)
-     {
-         createEnemies("vertical");
-         createEnemies("terrestre");
-     }
+    if(referenceObject.position.y < 1000)
+    {
+        x = Math.random()*100;
+        if(x >= 98.5)
+        {
+             createEnemies("vertical");
+             createEnemies("terrestre");
+        }
+    }
+    else
+    {
+        x = Math.random()*100;
+        //Caso seja maior que 95, cria um inimigo aleatoriamente:
+        if(x >= 99.3)
+        {
+            createEnemies("vertical");
+            createEnemies("terrestre");
+        }
+    }
+    
  }
 
  if((referenceObject.position.y >= 2000 && referenceObject.position.y <= 2500) ||
@@ -694,13 +725,15 @@ function enemiesCreation()
     (referenceObject.position.y >= 9000 && referenceObject.position.y <= 9500))
  {
      x = Math.random()*100;
+     y = Math.random()*2;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 97)
-         createEnemies("diagonalEsquerda");
-     x = Math.random()*100;
-     //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 97)        
-         createEnemies("diagonalDireita");    
+     if(x >= 98){
+        if(y <= 1)
+            createEnemies("diagonalEsquerda");
+        else
+            createEnemies("diagonalDireita");
+     }
+    
  }
 
  if((referenceObject.position.y >= 2500 && referenceObject.position.y <= 3000) ||
@@ -710,10 +743,11 @@ function enemiesCreation()
  {
      x = Math.random()*100;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 97)
+     if(x >= 98)
      {
          createEnemies("horizontal");
      }
+    
  }
 
  if((referenceObject.position.y >= 3000 && referenceObject.position.y <= 4000) ||
@@ -723,13 +757,27 @@ function enemiesCreation()
  {
      x = Math.random()*100;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 97)
+     if(x >= 98.6)
      {
          createEnemies("meia-lua");
      }
+     
  }
 
 }
+
+// Criaçao dos primeiros inimigos
+x = Math.random()*100;
+if(x <= 50){
+    createEnemies("vertical");
+    createEnemies("terrestre");
+    createEnemies("diagonalEsquerda");
+}else{
+    createEnemies("Horizontal");
+    createEnemies("diagonalDireita");
+    createEnemies("meia-lua");
+}
+
 
 render();
 
@@ -738,6 +786,9 @@ function render()
     //Move o plano e um object3D que auxilia na criação dos inimigos, baseando-se em sua posição no eixo Y
     plane.translateY(-1);
     referenceObject.translateY(1); 
+    if(referenceObject.position.y >= 6900)
+        resetaJogo();
+    console.log(referenceObject.position.y);
     enemiesCreation();
 
     //Gera os itens de cura aleatoriamente

@@ -26,10 +26,18 @@ class Ammo {
         }else if(tipo == "inimigo"){
             this.velocidadeY = 0;
             this.velocidadeZ = 7;
+            let variacao = distz/this.velocidadeZ;
+            let velX = distx/variacao;
+            this.velocidadeX = velX;
             this.inimigo = true;
         }else if(tipo == "ar-terra"){
             this.velocidadeY = -3;
-            this.velocidadeZ = -8;
+            this.velocidadeZ = -10;
+        }else if(tipo == "horizontal"){
+            this.velocidadeX = 6;
+            this.velocidadeY = 0;
+            this.velocidadeZ = 0;
+            this.inimigo = true;
         }else{
             this.velocidadeY = 3;
             this.velocidadeZ = 5;

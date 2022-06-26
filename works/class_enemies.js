@@ -1,5 +1,4 @@
 import * as THREE from "../build/three.module.js";
-import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 
 class Enemies {
 
@@ -11,6 +10,7 @@ class Enemies {
     velocidadeZ;
     terrestre = false;
     meiaLua = false;
+    horizontal = false;
     constructor(movimento, modelo){
         if(modelo == "fighter"){
             this.#geometry = new THREE.BoxGeometry(20, 10, 10);
@@ -33,6 +33,7 @@ class Enemies {
         }else if(movimento == "horizontal"){
             this.velocidadeZ = (Math.random()*2) + 2;
             this.velocidadeX = 0;
+            this.horizontal = true;
         }else if(movimento == "vertical"){
             this.velocidadeX = 0;
             this.velocidadeZ = (Math.random()*5) + 1;
