@@ -372,7 +372,6 @@ function createEnemies(move){
 function setModeloInimigo(modelo, objeto){
     let modeloInimigo;
     let loader = new GLTFLoader();
-    let loader2 = new FBXLoader();
     if(modelo == '../works/assets/fighter.glb'){
         loader.load(modelo, function(glb){
             modeloInimigo = glb.scene;            
@@ -387,18 +386,18 @@ function setModeloInimigo(modelo, objeto){
             modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
-    }else if(modelo == '../works/assets/helicopter.fbx'){
-        loader2.load(modelo, (object) => {
-            modeloInimigo = fbx.scene;
+    }else if(modelo == '../works/assets/cartoonPlane/scene.gltf'){
+        loader.load(modelo, function(gltf){
+            modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 1.2;
-            modeloInimigo.scale.y += 1.2;
-            modeloInimigo.scale.z += 1.2;
-            modeloInimigo.rotation.y += Math.PI/2;
+            modeloInimigo.scale.x += 9;
+            modeloInimigo.scale.y += 9;
+            modeloInimigo.scale.z += 9;
+            // modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
     }else if(modelo == '../works/assets/enemyPlane.fbx'){
@@ -408,10 +407,9 @@ function setModeloInimigo(modelo, objeto){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 2.3;
-            modeloInimigo.scale.y += 2.3;
-            modeloInimigo.scale.z += 2.3;
-            modeloInimigo.position.y -= 4;
+            modeloInimigo.scale.x -= .6;
+            modeloInimigo.scale.y -= .6;
+            modeloInimigo.scale.z -= .6;
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
@@ -421,9 +419,11 @@ function setModeloInimigo(modelo, objeto){
                 if(child)
                     child.castShadow = true;
             });
-            modeloInimigo.scale.x += 16;
-            modeloInimigo.scale.y += 16;
-            modeloInimigo.scale.z += 16;
+            modeloInimigo.scale.x += 2.6;
+            modeloInimigo.scale.y += 2.6;
+            modeloInimigo.scale.z += 2.6;
+            modeloInimigo.rotation.x -= 1.6;
+            modeloInimigo.rotation.z -= Math.PI;
             objeto.add(modeloInimigo);
         }, null, null);
     }    
@@ -750,7 +750,7 @@ function render()
     animationAviao();
     resetaVidas();
     controlledRender();
+    stats.update();
     trackballControls.update();
     requestAnimationFrame(render);
-    //renderer.render(scene, camera) // Render scene
 }

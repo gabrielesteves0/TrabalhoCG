@@ -14,19 +14,16 @@ class Enemies {
     constructor(movimento, modelo){
         if(modelo == "fighter"){
             this.#geometry = new THREE.BoxGeometry(20, 10, 10);
-        }else if(modelo == "jetPlane"){
-            this.#geometry = new THREE.BoxGeometry(20, 10, 26);
+        }else if(modelo == "cartoonPlane"){
+            this.#geometry = new THREE.BoxGeometry(20, 7, 20);
         }else if(modelo == "toonTank"){
             this.#geometry = new THREE.BoxGeometry(12, 9, 11);
-        }else if(modelo == "helicopter"){
-            this.#geometry = new THREE.BoxGeometry(22, 9, 22);
         }else{
-            
+            this.#geometry = new THREE.BoxGeometry(22, 9, 22);
         }
         this.object = new THREE.Mesh(this.#geometry, this.#material);
         this.object.geometry.computeBoundingBox();
         this.bBox.copy(this.object.geometry.boundingBox).applyMatrix4(this.object.matrixWorld);
-        // this.object.castShadow = true;
         if(movimento == "diagonalEsquerda"){
             this.velocidadeX = 0; //2.5
             this.velocidadeZ = 3;
