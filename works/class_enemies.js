@@ -41,23 +41,21 @@ class Enemies {
             this.velocidadeZ = (Math.random()*5) + 1;
         }else if(movimento == "terrestre"){
             this.velocidadeX = 0;
-            this.velocidadeZ = (Math.random()*5) + 1;
+            this.velocidadeZ = 2;
             this.terrestre = true;
         }else{
             this.velocidadeX = 2;
             this.velocidadeZ = 3;
             this.meiaLua = true;
         }
-
     }
 
     atualizacaoVelocidadeMeiaLua(posX){
         if(posX < 0)
             this.velocidadeZ -= .02;
         else
-            this.velocidadeZ -= .08;
+            this.velocidadeZ -= .07;
         this.object.rotation.y += 0.001;
     }
-
 }
 export default Enemies;
