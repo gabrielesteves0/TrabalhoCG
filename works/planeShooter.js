@@ -13,7 +13,6 @@ import {initRenderer,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
-import {FBXLoader} from '../build/jsm/loaders/FBXLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
@@ -43,11 +42,11 @@ function keyboardUpdate(){
     if(keyboard.pressed("down") && aviao.position.z <= 135) aviao.translateY(-2);
     if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
     if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
-    if(keyboard.down("space")){
+    if(keyboard.down("ctrl")){
         aviao.getWorldPosition(posicaoAviao);
         createAmmo("ar-ar", posicaoAviao, 0, 0);
     }
-    if(keyboard.down("ctrl")){
+    if(keyboard.down("space")){
         aviao.getWorldPosition(posicaoAviao);
         createAmmo("ar-terra", posicaoAviao, 0, 0);
     }
