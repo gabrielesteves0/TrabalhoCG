@@ -35,23 +35,54 @@ var renderer = new THREE.WebGLRenderer();    // View function in util/utils
 //Função KeyboardUpdate, para movimentação do avião:
 var keyboard = new KeyboardState();
 
+var cdrMissil = false;
+var cdrTiro = false;
+var play = true;
+
 function keyboardUpdate(){
     keyboard.update();
-
-    if(keyboard.pressed("up") && aviao.position.z >= -210)  aviao.translateY(2);
-    if(keyboard.pressed("down") && aviao.position.z <= 135) aviao.translateY(-2);
-    if(keyboard.pressed("left") && aviao.position.x >= -190)    aviao.translateX(-2);
-    if(keyboard.pressed("right") && aviao.position.x <= 190)   aviao.translateX(2);
-    if(keyboard.down("ctrl")){
-        aviao.getWorldPosition(posicaoAviao);
-        createAmmo("ar-ar", posicaoAviao, 0, 0);
+    if(keyboard.down("P"))  play = !play;
+    
+    if(play){
+        if(keyboard.pressed("up") && aviao.position.z >= -210)  aviao.translateY(2);
+        if(keyboard.pressed("down") && aviao.position.z <= 135) aviao.translateY(-2);
+        if(keyboard.pressed("left") && aviao.position.x >= -190){
+            aviao.translateX(-2);
+            rotacaoAviao("esquerda");
+        }
+        if(keyboard.pressed("right") && aviao.position.x <= 190){
+            aviao.translateX(2);
+            rotacaoAviao("direita");
+        }
+        if(!keyboard.pressed("right") && !keyboard.pressed("left")){
+            if(aviao.rotation.y > 0){
+                aviao.rotateY(degreesToRadians(-16));
+            }else if(aviao.rotation.y < 0){
+                aviao.rotateY(degreesToRadians(16));
+            }
+        }
+        if(keyboard.down("ctrl")){
+            aviao.getWorldPosition(posicaoAviao);
+            createAmmo("ar-ar", posicaoAviao, 0, 0);
+        }else if(keyboard.pressed("ctrl") && !cdrTiro){
+            aviao.getWorldPosition(posicaoAviao);
+            createAmmo("ar-ar", posicaoAviao, 0, 0);
+            cdrTiro = true;
+            setTimeout( () => cdrTiro = false, 500);
+        }
+        if(keyboard.down("space")){
+            aviao.getWorldPosition(posicaoAviao);
+            createAmmo("ar-terra", posicaoAviao, 0, 0);
+        }else if(keyboard.pressed("space") && !cdrMissil){
+            aviao.getWorldPosition(posicaoAviao);
+            createAmmo("ar-terra", posicaoAviao, 0, 0);
+            cdrMissil = true;
+            setTimeout( () => cdrMissil = false, 500);
+        }
+        
+        if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
+        if(keyboard.down("enter"))  resetaJogo();
     }
-    if(keyboard.down("space")){
-        aviao.getWorldPosition(posicaoAviao);
-        createAmmo("ar-terra", posicaoAviao, 0, 0);
-    }
-    if(keyboard.down("G"))  modoInvencivel = !modoInvencivel;
-    if(keyboard.down("enter"))  resetaJogo();
 }
 
 function moveObjects(){
@@ -103,6 +134,7 @@ function moveObjects(){
         index++;
     });
 }
+
 
 //Configuração e posicionamento da câmera:
 var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -234,6 +266,18 @@ loader.load('../works/assets/plane.glb', function(glb){
     modeloAviao.position.z -= 12;
     aviao.add(modeloAviao);
 }, null, null);
+
+
+function rotacaoAviao(direcao){
+    aviao.position.y = 50;
+    if(direcao == "esquerda"){
+        if(aviao.rotation.y > degreesToRadians(-16))
+            aviao.rotateY(degreesToRadians(-16));
+    }else if(direcao == "direita"){
+        if(aviao.rotation.y < degreesToRadians(16))
+            aviao.rotateY(degreesToRadians(16));
+    }
+}
 
 let vetorVidas = [];
 
@@ -783,26 +827,28 @@ render();
 function render()
 {
     //Move o plano e um object3D que auxilia na criação dos inimigos, baseando-se em sua posição no eixo Y
-    plane.translateY(-1);
-    referenceObject.translateY(1); 
-    if(referenceObject.position.y >= 6900)
-        resetaJogo();
-    enemiesCreation();
-
-    //Gera os itens de cura aleatoriamente
-    y = Math.random()*100;
-    if(y >= 99.5)
-        createHealObject();
-
-    //Chamada das funções no render: 
-    enemyShoot();
-    moveObjects();
-    atualizaBB();
-    checkCollisions();
     keyboardUpdate();
-    animationEnemy();
-    animationAviao();
-    resetaVidas();
+    if(play){
+        plane.translateY(-1);
+        referenceObject.translateY(1); 
+        if(referenceObject.position.y >= 6900)
+            resetaJogo();
+        enemiesCreation();
+
+        //Gera os itens de cura aleatoriamente
+        y = Math.random()*100;
+        if(y >= 99.5)
+            createHealObject();
+
+        //Chamada das funções no render: 
+        enemyShoot();
+        moveObjects();
+        atualizaBB();
+        checkCollisions();
+        animationEnemy();
+        animationAviao();
+        resetaVidas();
+    }
     controlledRender();
     stats.update();
     trackballControls.update();
