@@ -3,6 +3,8 @@ import Stats from '../build/jsm/libs/stats.module.js';
 import GUI from '../libs/util/dat.gui.module.js'
 import {TrackballControls} from '../build/jsm/controls/TrackballControls.js';
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
+import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
+import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import {initRenderer, 
         SecondaryBox,
         initDefaultBasicLight,
@@ -48,12 +50,12 @@ var infoBox = new SecondaryBox("");
 var objectArray = new Array();
 var activeObject = 0;
 
-loadGLTFFile('./assets/cartoonPlane/', 'scene.gltf', false, 2.0);
 loadGLTFFile('./assets/enemyPlane/', 'scene.gltf', false, 2.0);
-loadGLTFFile('./assets/pixelPlane/', 'scene.gltf', false, 2.0);
-loadGLTFFile('./assets/', 'plane.glb', false, 2.0);
-loadGLTFFile('./assets/', 'fighter.glb', true, 2.0);
-loadGLTFFile('./assets/', 'toonTank.glb', false, 2.0);
+loadOBJFile('./assets/F16 fighter/', 'f16', false, 2.0);
+loadOBJFile('./assets/missile/', 'missile', false, 2.0);
+loadOBJFile('../assets/objects/', 'plane', false, 2.0);
+loadOBJFile('./assets/jet_by_dommk/', 'jet_by_dommk', false, 2.0);
+loadOBJFile('./assets/navio/', 'ship_OBJ', false, 2.0);
 
 buildInterface();
 render();
@@ -84,6 +86,43 @@ function loadGLTFFile(modelPath, modelName, visibility, desiredScale)
     }, onProgress, onError);
 }
 
+function loadOBJFile(modelPath, modelName, visibility, desiredScale)
+{
+  var currentModel = modelName;
+  var manager = new THREE.LoadingManager( );
+
+  var mtlLoader = new MTLLoader( manager );
+  mtlLoader.setPath( modelPath );
+  mtlLoader.load( modelName + '.mtl', function ( materials ) {
+        materials.preload();
+
+        var objLoader = new OBJLoader( manager );
+        objLoader.setMaterials(materials);
+        objLoader.setPath(modelPath);
+        objLoader.load( modelName + ".obj", function ( obj ) {
+          obj.name = modelName;
+          obj.visible = visibility;
+          // Set 'castShadow' property for each children of the group
+          obj.traverse( function (child)
+          {
+            child.castShadow = true;
+          });
+
+          obj.traverse( function( node )
+          {
+            if( node.material ) node.material.side = THREE.DoubleSide;
+          });
+
+          var obj = normalizeAndRescale(obj, desiredScale);
+          var obj = fixPosition(obj);
+
+          scene.add ( obj );
+          objectArray.push( obj );
+
+        }, onProgress, onError );
+  });
+}
+
 function onError() { };
 
 function onProgress ( xhr, model ) {
@@ -111,7 +150,6 @@ function fixPosition(obj)
     obj.translateY(-box.min.y);
   else
     obj.translateY(-1*box.min.y);
-  obj.translateY(0.26);
   return obj;
 }
 
@@ -139,8 +177,7 @@ function buildInterface()
   // GUI interface
   var gui = new GUI();
   gui.add(controls, 'type',
-    ['Object0', 'Object1', 'Object2', 'Object3',
-      'Object4', 'Object5'])
+    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4', 'Object5'])
     .name("Change Object")
     .onChange(function(e) { controls.onChooseObject(); });
   gui.add(controls, 'viewAxes', false)

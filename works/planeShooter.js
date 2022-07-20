@@ -13,6 +13,8 @@ import {initRenderer,
         createLightSphere} from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
+import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
+import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
@@ -90,7 +92,7 @@ function moveObjects(){
     vetorCuras.forEach(item => {
         item.object.translateZ(item.velocidade);
         item.object.updateMatrixWorld(true);
-        if(item.object.position.z >= 150){
+        if(item.object.position.z >= 380){
             scene.remove(item.object);
             vetorCuras.splice(index, 1);
         }
@@ -110,7 +112,7 @@ function moveObjects(){
         item.object.updateMatrixWorld(true);
         
         //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
-        if(item.object.position.z >= 150 || item.object.position.x <= -250 || item.object.position.x >= 250){
+        if(item.object.position.z >= 310 || item.object.position.x <= -250 || item.object.position.x >= 250){
             scene.remove(item.object);
             vetorInimigos.splice(index, 1);
         }
@@ -127,7 +129,7 @@ function moveObjects(){
             item.resetVelocidadeY();
         }
         //Caso a posição em z seja menor que -400, o item é removido da cena e do seu vetor, assim como seu respectivo Box3.
-        if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 160){
+        if(item.object.position.z <= -400 || item.object.position.y <= -10 || item.object.position.z >= 230){
             scene.remove(item.object);
             vetorTiros.splice(index, 1);
         }
@@ -199,16 +201,16 @@ setDirectionalLighting(lightPosition);
 function setDirectionalLighting(position)
 {
   dirLight.position.copy(position);
-  dirLight.shadow.mapSize.width = 256;
-  dirLight.shadow.mapSize.height = 256;
+  dirLight.shadow.mapSize.width = 512;
+  dirLight.shadow.mapSize.height = 512;
   dirLight.castShadow = true;
 
   dirLight.shadow.camera.near = .1;
-  dirLight.shadow.camera.far = 800;
-  dirLight.shadow.camera.left = -200;
-  dirLight.shadow.camera.right = 200;
-  dirLight.shadow.camera.top = 250;
-  dirLight.shadow.camera.bottom = -200;
+  dirLight.shadow.camera.far = 570;
+  dirLight.shadow.camera.left = -210;
+  dirLight.shadow.camera.right = 210;
+  dirLight.shadow.camera.top = 170;
+  dirLight.shadow.camera.bottom = -80;
 
   scene.add(dirLight);
 }
@@ -223,7 +225,7 @@ var posicoesZ = [];
 var killedEnemies = [];
 
 //Cria o plano
-let plane = createGroundPlaneWired(400, 11000);
+let plane = createGroundPlaneWired(1200, 11000);
 plane.position.set(0, 0, -1870);
 scene.add(plane);
 
@@ -266,6 +268,48 @@ loader.load('../works/assets/plane.glb', function(glb){
     modeloAviao.position.z -= 12;
     aviao.add(modeloAviao);
 }, null, null);
+
+// function loadModeloAviao(modelPath, modelName, desiredScale, angle, visibility)
+// {
+//   var manager = new THREE.LoadingManager( );
+
+//   var mtlLoader = new MTLLoader( manager );
+//   mtlLoader.setPath( modelPath );
+//   mtlLoader.load( modelName + '.mtl', function ( materials ) {
+//       materials.preload();
+
+//       var objLoader = new OBJLoader( manager );
+//       objLoader.setMaterials(materials);
+//       objLoader.setPath(modelPath);
+//       objLoader.load( modelName + ".obj", function ( obj ) {
+//         obj.visible = visibility;
+//         obj.name = modelName;
+//         // Set 'castShadow' property for each children of the group
+//         obj.traverse( function (child)
+//         {
+//           child.castShadow = true;
+//         });
+
+//         obj.traverse( function( node )
+//         {
+//           if( node.material ) node.material.side = THREE.DoubleSide;
+//         });
+
+//         var obj = normalizeAndRescale(obj, desiredScale);
+//         var obj = fixPosition(obj);
+//         obj.rotateY(degreesToRadians(angle));
+
+//         scene.add ( obj );
+//         objectArray.push( obj );
+
+//         // Pick the index of the first visible object
+//         if(modelName == 'plane')
+//         {
+//           activeObject = objectArray.length-1;
+//         }
+//       }, onProgress, onError );
+//   });
+// }
 
 
 function rotacaoAviao(direcao){
@@ -584,6 +628,11 @@ function animationAviao(){
     }
 }
 
+function animationExplosao(position){
+    let geometry = new THREE.PlaneGeometry(100,100);
+    let material = new THREE.MeshLambertMaterial({transparent : true});
+}
+
 //                                  SISTEMA DE TIRO E COLISÃO:
 
 var trackballControls = new TrackballControls( camera, renderer.domElement );
@@ -732,7 +781,7 @@ function enemiesCreation()
  {
      x = Math.random()*100;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 98)
+     if(x >= 99)
      {
          createEnemies("vertical");
          createEnemies("terrestre");
@@ -743,7 +792,7 @@ function enemiesCreation()
     if(referenceObject.position.y < 1000)
     {
         x = Math.random()*100;
-        if(x >= 98.5)
+        if(x >= 99.6)
         {
              createEnemies("vertical");
              createEnemies("terrestre");
@@ -770,7 +819,7 @@ function enemiesCreation()
      x = Math.random()*100;
      y = Math.random()*2;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 98){
+     if(x >= 99){
         if(y <= 1)
             createEnemies("diagonalEsquerda");
         else
@@ -786,7 +835,7 @@ function enemiesCreation()
  {
      x = Math.random()*100;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 98)
+     if(x >= 99)
      {
          createEnemies("horizontal");
      }
@@ -800,7 +849,7 @@ function enemiesCreation()
  {
      x = Math.random()*100;
      //Caso seja maior que 95, cria um inimigo aleatoriamente:
-     if(x >= 98.6)
+     if(x >= 99.2)
      {
          createEnemies("meia-lua");
      }

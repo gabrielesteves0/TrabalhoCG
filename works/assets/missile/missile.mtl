@@ -1,0 +1,8 @@
+newmtl skyguard_sparrow
+Ka 0.300000 0.300000 0.300000
+Kd 0.700000 0.700000 0.700000
+Ks 0.000000 0.000000 0.000000
+Ns 20.000000
+Tr 0.000000
+illum 1
+map_Kd G:\Work_Transas\_MainWork\Skyguard\Skyguard___XSI\Pictures\Skyguard_Launcher_Rocket_diffuse.jpg
