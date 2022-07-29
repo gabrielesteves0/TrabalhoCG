@@ -243,73 +243,58 @@ let modoInvencivel = false;
 let auxAnimationAviao = false;
 
 aviao.material.transparent = true;
-aviao.material.opacity = 0;
+aviao.material.opacity = 0.3;
 
 let posicaoAviao = new THREE.Vector3(0,0,0);
 let aviaoBB = new THREE.Box3();
 aviao.geometry.computeBoundingBox(aviaoBB);
 
-let modeloAviao;
-let loader = new GLTFLoader();
+loadOBJFile('./assets/plane7/', 'plane', aviao);
 
-loader.load('../works/assets/plane.glb', function(glb){
-    modeloAviao = glb.scene;
-    
-    modeloAviao.traverse(function(child){
-        if(child)
+function loadOBJFile(modelPath, modelName, object)
+{
+  var manager = new THREE.LoadingManager( );
+  console.log(modelPath);
+  console.log(modelName);
+
+  var mtlLoader = new MTLLoader( manager );
+  mtlLoader.setPath( modelPath );
+  mtlLoader.load( modelName + '.mtl', function ( materials ) {
+        materials.preload();
+
+        var objLoader = new OBJLoader( manager );
+        objLoader.setMaterials(materials);
+        objLoader.setPath(modelPath);
+        objLoader.load( modelName + ".obj", function ( obj ) {
+          obj.name = modelName;
+          // Set 'castShadow' property for each children of the group
+          obj.traverse( function (child)
+          {
             child.castShadow = true;
-    });
-    modeloAviao.scale.x += 2.3;
-    modeloAviao.scale.y += 2.3;
-    modeloAviao.scale.z += 2.3;
-    modeloAviao.rotation.x -= 1.6;
-    modeloAviao.rotation.z -= Math.PI;
-    modeloAviao.position.y -= 2;
-    modeloAviao.position.z -= 12;
-    aviao.add(modeloAviao);
-}, null, null);
+          });
 
-// function loadModeloAviao(modelPath, modelName, desiredScale, angle, visibility)
-// {
-//   var manager = new THREE.LoadingManager( );
+          obj.traverse( function( node )
+          {
+            if( node.material )node.material.side = THREE.DoubleSide;
+          });
 
-//   var mtlLoader = new MTLLoader( manager );
-//   mtlLoader.setPath( modelPath );
-//   mtlLoader.load( modelName + '.mtl', function ( materials ) {
-//       materials.preload();
+          if(modelName == 'Fighter_Plane_Sukhoi-30'){
 
-//       var objLoader = new OBJLoader( manager );
-//       objLoader.setMaterials(materials);
-//       objLoader.setPath(modelPath);
-//       objLoader.load( modelName + ".obj", function ( obj ) {
-//         obj.visible = visibility;
-//         obj.name = modelName;
-//         // Set 'castShadow' property for each children of the group
-//         obj.traverse( function (child)
-//         {
-//           child.castShadow = true;
-//         });
+          }else if(modelName == 'uploads_files_874121_CosmoDragon'){
 
-//         obj.traverse( function( node )
-//         {
-//           if( node.material ) node.material.side = THREE.DoubleSide;
-//         });
+          }else if(modelName == 'boat'){
 
-//         var obj = normalizeAndRescale(obj, desiredScale);
-//         var obj = fixPosition(obj);
-//         obj.rotateY(degreesToRadians(angle));
+          }else if(modelName == 'plane'){
+                object.position.set(0, 30, 0);
+          }else{
 
-//         scene.add ( obj );
-//         objectArray.push( obj );
+          }
 
-//         // Pick the index of the first visible object
-//         if(modelName == 'plane')
-//         {
-//           activeObject = objectArray.length-1;
-//         }
-//       }, onProgress, onError );
-//   });
-// }
+          object.add ( obj );
+
+        }, onProgress, onError );
+  });
+}
 
 
 function rotacaoAviao(direcao){
@@ -362,23 +347,23 @@ function createHealObject(){
 function createEnemies(move){
     //Definição dos modelos dos inimigos aéreos aleatória:
     let defModelos = Math.random()*100;
-    let modelo;
     let pathModelo;
+    let modelName;
     if(defModelos <= 45){
-        modelo = "fighter";
-        pathModelo = '../works/assets/fighter.glb';
+        pathModelo = '.assets/plane1/';
+        modelName = 'Fighter_Plane_Sukhoi-30';
     }else if(defModelos > 45 && defModelos <= 75){
-        modelo = "cartoonPlane";
-        pathModelo = '../works/assets/cartoonPlane/scene.gltf';
+        modelName = 'uploads_files_874121_CosmoDragon';
+        pathModelo = '.assets/plane5/';
     }else{
-        modelo = "enemyPlane";
-        pathModelo = '../works/assets/enemyPlane/scene.gltf';
+        modelName = 'scene';
+        pathModelo = './assets/enemyPlane/';
     }
 
     //vertical
     if(move == "vertical")
     {
-        let enemy1 = new Enemies(move, modelo);
+        let enemy1 = new Enemies(move, modelName);
         let positionX1 = (Math.random() * 175);
         let positionZ1 = -350;
         let sinal1 = Math.random()*2;
@@ -389,16 +374,13 @@ function createEnemies(move){
         enemy1.object.material.opacity = 0;
         vetorInimigos.push(enemy1);
         scene.add(enemy1.object);
-        setModeloInimigo(pathModelo, enemy1.object);
+        setModeloInimigo(modelName, pathModelo, enemy1.object);
     }
-    // setModeloInimigo('../works/assets/enemyPlane.fbx', enemy.object);
-    // setModeloInimigo('../works/assets/jetPlane.fbx', enemy.object);
-    // setModeloInimigo('../works/assets/helicopter.fbx', enemy.object);
 
     // horizontal
     if(move == "horizontal")
     {
-        let enemy2 = new Enemies(move, modelo);
+        let enemy2 = new Enemies(move, modelName);
         let positionX2 = -250;
         let positionZ2 = Math.random()*200;
         let sinal2 = Math.random()*2;
@@ -410,13 +392,13 @@ function createEnemies(move){
         enemy2.object.rotation.y += Math.PI/2;
         vetorInimigos.push(enemy2);
         scene.add(enemy2.object);
-        setModeloInimigo(pathModelo, enemy2.object);
+        setModeloInimigo(modelName, pathModelo, enemy2.object);
     }
 
     // diagonal esquerda
     if(move == "diagonalEsquerda")
     {
-        let enemy3 = new Enemies(move, modelo);
+        let enemy3 = new Enemies(move, modelName);
         let positionX3 = -195;
         let positionZ3 = -300;
         enemy3.object.position.set(positionX3, 50, positionZ3);
@@ -425,13 +407,13 @@ function createEnemies(move){
         enemy3.object.rotation.y += 0.698132; // 40 graus em radianos
         vetorInimigos.push(enemy3);
         scene.add(enemy3.object);
-        setModeloInimigo(pathModelo, enemy3.object);
+        setModeloInimigo(modelName, pathModelo, enemy3.object);
     }
 
     // diagonal direita
     if(move == "diagonalDireita")
     {
-        let enemy4 = new Enemies(move, modelo);
+        let enemy4 = new Enemies(move, modelName);
         let positionX4 = 195;
         let positionZ4 = -300;
         enemy4.object.position.set(positionX4, 50, positionZ4);
@@ -440,13 +422,13 @@ function createEnemies(move){
         enemy4.object.rotation.y -= 0.698132; // 40 graus em radianos
         vetorInimigos.push(enemy4);
         scene.add(enemy4.object);
-        setModeloInimigo(pathModelo, enemy4.object);
+        setModeloInimigo(modelName, pathModelo, enemy4.object);
     }
 
     // terrestre
     if(move == "terrestre")
     {
-        let enemy5 = new Enemies(move, "toonTank");
+        let enemy5 = new Enemies(move, 'boat');
         let positionX5 = (Math.random() * 175);
         let positionZ5 = -350;
         let sinal3 = Math.random()*2;
@@ -457,13 +439,15 @@ function createEnemies(move){
         enemy5.object.material.opacity = 0;
         scene.add(enemy5.object);
         vetorInimigos.push(enemy5);
-        setModeloInimigo('../works/assets/toonTank.glb', enemy5.object);
+        pathModelo = './assets/ship3/';
+        modelName = 'boat';
+        setModeloInimigo(modelName, pathModelo, enemy5.object);
     }
 
     // meia-lua
     if(move == "meia-lua")
     {
-        let enemy6 = new Enemies(move, modelo);
+        let enemy6 = new Enemies(move, modelName);
         let positionX6 = -195;
         let positionZ6 = -300;
         enemy6.object.position.set(positionX6, 50, positionZ6);
@@ -471,44 +455,16 @@ function createEnemies(move){
         enemy6.object.material.opacity = 0;
         vetorInimigos.push(enemy6);
         scene.add(enemy6.object);
-        setModeloInimigo(pathModelo, enemy6.object);
+        setModeloInimigo(modelName, pathModelo, enemy6.object);
     }
 }
 
 //Função que define o modelo dos inimigos
-function setModeloInimigo(modelo, objeto){
+function setModeloInimigo(modelo, path, objeto){
     let modeloInimigo;
     let loader = new GLTFLoader();
-    if(modelo == '../works/assets/fighter.glb'){
-        loader.load(modelo, function(glb){
-            modeloInimigo = glb.scene;
-            
-            modeloInimigo.traverse(function(child){
-                if(child)
-                    child.castShadow = true;
-            });
-            modeloInimigo.scale.x += 2.6;
-            modeloInimigo.scale.y += 2.6;
-            modeloInimigo.scale.z += 2.6;
-            modeloInimigo.rotation.x -= 1.6;
-            modeloInimigo.rotation.z -= Math.PI;
-            objeto.add(modeloInimigo);
-        }, null, null);
-    }else if(modelo == '../works/assets/cartoonPlane/scene.gltf'){
-        loader.load(modelo, function(gltf){
-            modeloInimigo = gltf.scene;
-            
-            modeloInimigo.traverse(function(child){
-                if(child)
-                    child.castShadow = true;
-            });
-            modeloInimigo.scale.x += 9;
-            modeloInimigo.scale.y += 9;
-            modeloInimigo.scale.z += 9;
-            objeto.add(modeloInimigo);
-        }, null, null);
-    }else if(modelo == '../works/assets/enemyPlane/scene.gltf'){
-        loader.load(modelo, function(gltf){
+    if(modelo == 'scene'){
+        loader.load(path + modelo, function(gltf){
             modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
@@ -521,18 +477,7 @@ function setModeloInimigo(modelo, objeto){
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
-        loader.load(modelo, function(gltf){
-            modeloInimigo = gltf.scene;
-            
-            modeloInimigo.traverse(function(child){
-                if(child)
-                    child.castShadow = true;
-            });
-            modeloInimigo.scale.x += 2.9;
-            modeloInimigo.scale.y += 2.9;
-            modeloInimigo.scale.z += 2.9;
-            objeto.add(modeloInimigo);
-        }, null, null);
+        loadOBJFile(path, modelo, objeto);
     }
     
 }
@@ -877,27 +822,27 @@ function render()
 {
     //Move o plano e um object3D que auxilia na criação dos inimigos, baseando-se em sua posição no eixo Y
     keyboardUpdate();
-    if(play){
-        plane.translateY(-1);
-        referenceObject.translateY(1); 
-        if(referenceObject.position.y >= 6900)
-            resetaJogo();
-        enemiesCreation();
+    // if(play){
+    //     plane.translateY(-1);
+    //     referenceObject.translateY(1); 
+    //     if(referenceObject.position.y >= 6900)
+    //         resetaJogo();
+    //     enemiesCreation();
 
-        //Gera os itens de cura aleatoriamente
-        y = Math.random()*100;
-        if(y >= 99.5)
-            createHealObject();
+    //     //Gera os itens de cura aleatoriamente
+    //     y = Math.random()*100;
+    //     if(y >= 99.5)
+    //         createHealObject();
 
-        //Chamada das funções no render: 
-        enemyShoot();
-        moveObjects();
-        atualizaBB();
-        checkCollisions();
-        animationEnemy();
-        animationAviao();
-        resetaVidas();
-    }
+    //     //Chamada das funções no render: 
+    //     enemyShoot();
+    //     moveObjects();
+    //     atualizaBB();
+    //     checkCollisions();
+    //     animationEnemy();
+    //     animationAviao();
+    //     resetaVidas();
+    // }
     controlledRender();
     stats.update();
     trackballControls.update();
