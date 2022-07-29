@@ -1,0 +1,33 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl FrontColor
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.330000 0.330000 0.330000
+
+newmtl Wood__Floor
+Ka 0.000000 0.000000 0.000000
+Kd 0.603922 0.411765 0.231373
+Ks 0.330000 0.330000 0.330000
+map_Kd boat/Wood__Floor.jpg
+
+newmtl Wood_Lumber_ButtJoined
+Ka 0.000000 0.000000 0.000000
+Kd 0.639216 0.596078 0.431373
+Ks 0.330000 0.330000 0.330000
+map_Kd boat/Wood_Lumber_ButtJoined.jpg
+
+newmtl Metal_Seamed
+Ka 0.000000 0.000000 0.000000
+Kd 0.462745 0.466667 0.447059
+Ks 0.330000 0.330000 0.330000
+map_Kd boat/Metal_Seamed.jpg
+
+newmtl Sketchy_Crosshatch_Wavy
+Ka 0.000000 0.000000 0.000000
+Kd 0.913725 0.913725 0.913725
+Ks 0.330000 0.330000 0.330000
+map_Kd boat/Sketchy_Crosshatch_Wavy.jpg
+

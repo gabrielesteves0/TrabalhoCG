@@ -53,8 +53,8 @@ var activeObject = 0;
 loadGLTFFile('./assets/enemyPlane/', 'scene.gltf', false, 2.0);
 loadOBJFile('../assets/objects/', 'plane', false, 2.0);
 loadOBJFile('./assets/plane1/', 'Fighter_Plane_Sukhoi-30', false, 2.0);
-loadOBJFile('./assets/plane2/', 'f16', false, 2.0);
-loadOBJFile('./assets/ship1/', 'Lowpoly boat', false, 2.0);
+loadOBJFile('./assets/ship3/', 'boat', false, 2.0);
+loadOBJFile('./assets/missile2/', 'uploads_files_1895467_MLRS_Rocket', false, 2.0);
 
 
 buildInterface();

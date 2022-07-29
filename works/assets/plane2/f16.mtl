@@ -10,6 +10,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 3
+map_Ka f16.blend
+map_Kd f16.blend
+map_Ks f16.blend
+map_Ke f16.blend
 
 newmtl Material.001
 Ns 900.000000
@@ -20,6 +24,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 3
+map_Ka f16.blend
+map_Kd f16.blend
+map_Ks f16.blend
+map_Ke f16.blend
 
 newmtl Material.005
 Ns 225.000000
@@ -30,6 +38,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+map_Ka f16.blend
+map_Kd f16.blend
+map_Ks f16.blend
+map_Ke f16.blend
 
 newmtl Material.006
 Ns 225.000000
@@ -40,6 +52,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 3
+map_Ka f16.blend
+map_Kd f16.blend
+map_Ks f16.blend
+map_Ke f16.blend
 
 newmtl Material.007
 Ns 225.000000
@@ -50,3 +66,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 3
+map_Ka f16.blend
+map_Kd f16.blend
+map_Ks f16.blend
+map_Ke f16.blend
