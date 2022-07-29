@@ -51,11 +51,11 @@ var objectArray = new Array();
 var activeObject = 0;
 
 loadGLTFFile('./assets/enemyPlane/', 'scene.gltf', false, 2.0);
-loadOBJFile('./assets/F16 fighter/', 'f16', false, 2.0);
-loadOBJFile('./assets/missile/', 'missile', false, 2.0);
 loadOBJFile('../assets/objects/', 'plane', false, 2.0);
-loadOBJFile('./assets/jet_by_dommk/', 'jet_by_dommk', false, 2.0);
-loadOBJFile('./assets/navio/', 'ship_OBJ', false, 2.0);
+loadOBJFile('./assets/plane1/', 'Fighter_Plane_Sukhoi-30', false, 2.0);
+loadOBJFile('./assets/plane2/', 'f16', false, 2.0);
+loadOBJFile('./assets/ship1/', 'Lowpoly boat', false, 2.0);
+
 
 buildInterface();
 render();
@@ -110,7 +110,7 @@ function loadOBJFile(modelPath, modelName, visibility, desiredScale)
 
           obj.traverse( function( node )
           {
-            if( node.material ) node.material.side = THREE.DoubleSide;
+            if( node.material )node.material.side = THREE.DoubleSide;
           });
 
           var obj = normalizeAndRescale(obj, desiredScale);
@@ -177,7 +177,7 @@ function buildInterface()
   // GUI interface
   var gui = new GUI();
   gui.add(controls, 'type',
-    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4', 'Object5'])
+    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4'])
     .name("Change Object")
     .onChange(function(e) { controls.onChooseObject(); });
   gui.add(controls, 'viewAxes', false)
