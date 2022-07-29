@@ -51,10 +51,11 @@ var objectArray = new Array();
 var activeObject = 0;
 
 loadGLTFFile('./assets/enemyPlane/', 'scene.gltf', false, 2.0);
-loadOBJFile('../assets/objects/', 'plane', false, 2.0);
+loadOBJFile('./assets/plane7/', 'plane', false, 2.0);
 loadOBJFile('./assets/plane1/', 'Fighter_Plane_Sukhoi-30', false, 2.0);
 loadOBJFile('./assets/ship3/', 'boat', false, 2.0);
 loadOBJFile('./assets/missile2/', 'uploads_files_1895467_MLRS_Rocket', false, 2.0);
+loadOBJFile('./assets/plane5/', 'uploads_files_874121_CosmoDragon', false, 2.0);
 
 
 buildInterface();
@@ -177,7 +178,7 @@ function buildInterface()
   // GUI interface
   var gui = new GUI();
   gui.add(controls, 'type',
-    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4'])
+    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4', 'Object 5'])
     .name("Change Object")
     .onChange(function(e) { controls.onChooseObject(); });
   gui.add(controls, 'viewAxes', false)
