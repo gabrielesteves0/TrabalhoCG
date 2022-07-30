@@ -13,11 +13,11 @@ class Enemies {
     horizontal = false;
     constructor(movimento, modelo){
         if(modelo == "Fighter_Plane_Sukhoi-30"){
-            this.#geometry = new THREE.BoxGeometry(20, 10, 10);
+            this.#geometry = new THREE.BoxGeometry(24, 8, 24);
         }else if(modelo == "uploads_files_874121_CosmoDragon"){
-            this.#geometry = new THREE.BoxGeometry(20, 7, 20);
+            this.#geometry = new THREE.BoxGeometry(22, 7, 26);
         }else if(modelo == "boat"){
-            this.#geometry = new THREE.BoxGeometry(12, 9, 11);
+            this.#geometry = new THREE.BoxGeometry(14, 14, 18);
         }else{
             this.#geometry = new THREE.BoxGeometry(22, 9, 22);
         }

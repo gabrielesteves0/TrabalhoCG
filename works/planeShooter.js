@@ -101,29 +101,31 @@ function moveObjects(){
 
     index = 0;
     
-    vetorInimigos.forEach(item => {
-        //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
-        item.object.translateZ(item.velocidadeZ);
-        item.object.translateX(item.velocidadeX);
+    // vetorInimigos.forEach(item => {
+    //     //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
+    //     item.object.translateZ(item.velocidadeZ);
+    //     item.object.translateX(item.velocidadeX);
         
-        if(item.meiaLua == true )
-            item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
-        //Atualiza sua posição em relação ao mundo:
-        item.object.updateMatrixWorld(true);
+    //     if(item.meiaLua == true )
+    //         item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
+    //     //Atualiza sua posição em relação ao mundo:
+    //     item.object.updateMatrixWorld(true);
         
-        //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
-        if(item.object.position.z >= 310 || item.object.position.x <= -250 || item.object.position.x >= 250){
-            scene.remove(item.object);
-            vetorInimigos.splice(index, 1);
-        }
-        index++;
-    });
+    //     //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
+    //     if(item.object.position.z >= 310 || item.object.position.x <= -250 || item.object.position.x >= 250){
+    //         scene.remove(item.object);
+    //         vetorInimigos.splice(index, 1);
+    //     }
+    //     index++;
+    // });
 
     index = 0;
     vetorTiros.forEach(item => {
         item.object.translateX(item.velocidadeX);
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
+        if(item.terraAr)
+            item.object.rotate.z -= 0.06;
         item.object.updateMatrixWorld(true);
         if(item.object.position.y >= 50 && item.terraAr){
             item.resetVelocidadeY();
@@ -232,7 +234,7 @@ scene.add(plane);
 //                                  MODELAGEM E DINÂMICA:
 
 //Modelagem do avião:
-let aviao = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 6), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
+let aviao = new THREE.Mesh(new THREE.BoxGeometry(16, 24, 6), new THREE.MeshPhongMaterial({color:"rgb(255,255,255)", shininess:200}));
 aviao.rotateX(degreesToRadians(-90));
 aviao.translateY(50);
 aviao.position.set(0, 50, 110);
@@ -243,15 +245,15 @@ let modoInvencivel = false;
 let auxAnimationAviao = false;
 
 aviao.material.transparent = true;
-aviao.material.opacity = 0.3;
+aviao.material.opacity = 0;
 
 let posicaoAviao = new THREE.Vector3(0,0,0);
 let aviaoBB = new THREE.Box3();
 aviao.geometry.computeBoundingBox(aviaoBB);
 
-loadOBJFile('./assets/plane7/', 'plane', aviao);
+loadOBJFile('./assets/plane7/', 'plane', aviao, "");
 
-function loadOBJFile(modelPath, modelName, object)
+function loadOBJFile(modelPath, modelName, object, target)
 {
   var manager = new THREE.LoadingManager( );
   console.log(modelPath);
@@ -279,20 +281,43 @@ function loadOBJFile(modelPath, modelName, object)
           });
 
           if(modelName == 'Fighter_Plane_Sukhoi-30'){
-
+                obj.scale.x *= 0.04;
+                obj.scale.y *= 0.04;
+                obj.scale.z *= 0.04;
+                obj.position.y -= 6;
           }else if(modelName == 'uploads_files_874121_CosmoDragon'){
-
+                obj.scale.x *= 0.04;
+                obj.scale.y *= 0.04;
+                obj.scale.z *= 0.04;
+                obj.position.y -= 4;
           }else if(modelName == 'boat'){
-
+                obj.scale.x *= 2.5;
+                obj.scale.y *= 2.5;
+                obj.scale.z *= 2.5;
+                obj.rotation.y += 300;
+                obj.position.y -= 4;
           }else if(modelName == 'plane'){
-                object.position.set(0, 30, 0);
+                obj.scale.x -= 1.3;
+                obj.scale.y -= 1.3;
+                obj.scale.z -= 1.3;
+                obj.rotation.y -= 300;
+                obj.rotation.x += 300;
+                obj.position.z -= 3;
           }else{
-
+                obj.scale.x *= 2;
+                obj.scale.y *= 2;
+                obj.scale.z *= 2;
+                if(target == "ar-ar")
+                    obj.rotation.x += 600;
+                else if(target == "ar-terra")
+                    obj.rotation.x += 700;
+                else if(target == "terra-ar")
+                    obj.rotation.x += 300;
           }
 
           object.add ( obj );
 
-        }, onProgress, onError );
+        }, null, null );
   });
 }
 
@@ -350,11 +375,11 @@ function createEnemies(move){
     let pathModelo;
     let modelName;
     if(defModelos <= 45){
-        pathModelo = '.assets/plane1/';
+        pathModelo = './assets/plane1/';
         modelName = 'Fighter_Plane_Sukhoi-30';
     }else if(defModelos > 45 && defModelos <= 75){
         modelName = 'uploads_files_874121_CosmoDragon';
-        pathModelo = '.assets/plane5/';
+        pathModelo = './assets/plane5/';
     }else{
         modelName = 'scene';
         pathModelo = './assets/enemyPlane/';
@@ -375,6 +400,7 @@ function createEnemies(move){
         vetorInimigos.push(enemy1);
         scene.add(enemy1.object);
         setModeloInimigo(modelName, pathModelo, enemy1.object);
+        
     }
 
     // horizontal
@@ -442,6 +468,7 @@ function createEnemies(move){
         pathModelo = './assets/ship3/';
         modelName = 'boat';
         setModeloInimigo(modelName, pathModelo, enemy5.object);
+        enemy5.object.position.set(0, 10, -150);
     }
 
     // meia-lua
@@ -464,7 +491,7 @@ function setModeloInimigo(modelo, path, objeto){
     let modeloInimigo;
     let loader = new GLTFLoader();
     if(modelo == 'scene'){
-        loader.load(path + modelo, function(gltf){
+        loader.load(path + modelo + '.gltf', function(gltf){
             modeloInimigo = gltf.scene;
             
             modeloInimigo.traverse(function(child){
@@ -477,7 +504,7 @@ function setModeloInimigo(modelo, path, objeto){
             objeto.add(modeloInimigo);
         }, null, null);
     }else{
-        loadOBJFile(path, modelo, objeto);
+        loadOBJFile(path, modelo, objeto, "");
     }
     
 }
@@ -599,6 +626,10 @@ function createAmmo(tipo, target, distx, distz){
     }else
         tiro = new Ammo(tipo, distx, distz);
     tiro.object.position.set(target.x, target.y, target.z);
+    let modelPath = './assets/missile2/';
+    let modelName = 'uploads_files_1895467_MLRS_Rocket';
+    tiro.object.rotateX(degreesToRadians(90));
+    loadOBJFile(modelPath, modelName, tiro.object, tipo);
     scene.add(tiro.object);
     vetorTiros.push(tiro);
 }
@@ -626,6 +657,7 @@ function enemyShoot(){
             }
         }
     });
+    console.log("pey");
 }
 
 //Função que checa colisões na cena:
@@ -804,17 +836,18 @@ function enemiesCreation()
 }
 
 // Criaçao dos primeiros inimigos
-x = Math.random()*100;
-if(x <= 50){
-    createEnemies("vertical");
-    createEnemies("terrestre");
-    createEnemies("diagonalEsquerda");
-}else{
-    createEnemies("Horizontal");
-    createEnemies("diagonalDireita");
-    createEnemies("meia-lua");
-}
+// x = Math.random()*100;
+// if(x <= 50){
+//     createEnemies("vertical");
+//     createEnemies("terrestre");
+//     createEnemies("diagonalEsquerda");
+// }else{
+//     createEnemies("Horizontal");
+//     createEnemies("diagonalDireita");
+//     createEnemies("meia-lua");
+// }
 
+createEnemies("terrestre");
 
 render();
 
@@ -843,6 +876,10 @@ function render()
     //     animationAviao();
     //     resetaVidas();
     // }
+
+    enemyShoot();
+    moveObjects();
+
     controlledRender();
     stats.update();
     trackballControls.update();
