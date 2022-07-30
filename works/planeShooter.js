@@ -18,6 +18,7 @@ import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
+import { Water } from './assets/water/Water2.js';
 
 // Status (FPS)
 const stats = new Stats();
@@ -137,6 +138,18 @@ function moveObjects(){
         }
         index++;
     });
+
+    vetorPlanos.forEach(item => {
+        item.translateZ(1);
+        if(item.position.z == 650)
+            item.position.set(0, 0, -1850);
+    });
+
+    vetorWater.forEach(item => {
+        item.translateZ(1);
+        if(item.position.z == 650)
+            item.position.set(0, 10, -1850);
+    });
 }
 
 
@@ -219,6 +232,8 @@ function setDirectionalLighting(position)
 
 var vetorTiros = [];
 var vetorInimigos = [];
+var vetorPlanos = [];
+var vetorWater = [];
 var posicoesX = [];
 var posicoesY = [];
 var posicoesZ = [];
@@ -226,10 +241,43 @@ var posicoesZ = [];
 //Vetor para armazenar os inimigos mortos (auxilia na animação dos inimigos quando são atingidos):
 var killedEnemies = [];
 
+const params = {
+    color: '#ffffff',
+    scale: 4,
+    flowX: 1,
+    flowY: 1
+};
+
 //Cria o plano
-let plane = createGroundPlaneWired(1200, 11000);
-plane.position.set(0, 0, -1870);
-scene.add(plane);
+for(let i = 0; i < 4; i++){
+    // let plane = createGroundPlaneWired(400, 500);
+    // plane.position.set(0, 0, i*-350);
+    // vetorPlanos.push(plane);
+    // scene.add(plane);
+    let water = createWater();
+    water.position.set(0, 10, i*-350);
+    vetorWater.push(water);
+    scene.add(water);
+}
+
+
+function createWater(){
+    let waterGeometry = new THREE.PlaneGeometry(400, 500);
+    let water = new Water( waterGeometry, {
+        color: params.color,
+        scale: params.scale,
+        flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
+        textureWidth: 1024,
+        textureHeight: 1024
+      } );
+
+    water.rotation.x = Math.PI * - 0.5;
+    return water;
+}
+// let plane = createGroundPlaneWired(400, 11000);
+// plane.position.set(0, 0, -1870);
+// scene.add(plane);
+
 
 //                                  MODELAGEM E DINÂMICA:
 
@@ -847,7 +895,7 @@ function enemiesCreation()
 //     createEnemies("meia-lua");
 // }
 
-createEnemies("terrestre");
+// createEnemies("terrestre");
 
 render();
 
@@ -856,7 +904,6 @@ function render()
     //Move o plano e um object3D que auxilia na criação dos inimigos, baseando-se em sua posição no eixo Y
     keyboardUpdate();
     // if(play){
-    //     plane.translateY(-1);
     //     referenceObject.translateY(1); 
     //     if(referenceObject.position.y >= 6900)
     //         resetaJogo();
@@ -877,7 +924,7 @@ function render()
     //     resetaVidas();
     // }
 
-    enemyShoot();
+    // enemyShoot();
     moveObjects();
 
     controlledRender();
