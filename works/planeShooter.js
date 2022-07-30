@@ -102,23 +102,23 @@ function moveObjects(){
 
     index = 0;
     
-    // vetorInimigos.forEach(item => {
-    //     //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
-    //     item.object.translateZ(item.velocidadeZ);
-    //     item.object.translateX(item.velocidadeX);
+    vetorInimigos.forEach(item => {
+        //Translada o inimigo de acordo com sua velocidade, definida aleatoriamente:
+        item.object.translateZ(item.velocidadeZ);
+        item.object.translateX(item.velocidadeX);
         
-    //     if(item.meiaLua == true )
-    //         item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
-    //     //Atualiza sua posição em relação ao mundo:
-    //     item.object.updateMatrixWorld(true);
+        if(item.meiaLua == true )
+            item.atualizacaoVelocidadeMeiaLua(item.object.position.x);
+        //Atualiza sua posição em relação ao mundo:
+        item.object.updateMatrixWorld(true);
         
-    //     //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
-    //     if(item.object.position.z >= 310 || item.object.position.x <= -250 || item.object.position.x >= 250){
-    //         scene.remove(item.object);
-    //         vetorInimigos.splice(index, 1);
-    //     }
-    //     index++;
-    // });
+        //Caso a posição em z seja maior que 150, o item é removido da cena e do seu vetor, assim como seu respectivo Box3 e sua velocidade.
+        if(item.object.position.z >= 310 || item.object.position.x <= -250 || item.object.position.x >= 250){
+            scene.remove(item.object);
+            vetorInimigos.splice(index, 1);
+        }
+        index++;
+    });
 
     index = 0;
     vetorTiros.forEach(item => {
@@ -126,7 +126,7 @@ function moveObjects(){
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
         if(item.terraAr)
-            item.object.rotate.z -= 0.06;
+            item.object.rotation.z -= 0.06;
         item.object.updateMatrixWorld(true);
         if(item.object.position.y >= 50 && item.terraAr){
             item.resetVelocidadeY();
@@ -140,15 +140,45 @@ function moveObjects(){
     });
 
     vetorPlanos.forEach(item => {
-        item.translateZ(1);
-        if(item.position.z == 650)
-            item.position.set(0, 0, -1850);
+        item.position.z += 1;        
+        if(item.position.z == 500)
+            item.position.set(0, 0, -1500);
     });
 
     vetorWater.forEach(item => {
-        item.translateZ(1);
-        if(item.position.z == 650)
-            item.position.set(0, 10, -1850);
+        item.position.z += 1;
+        if(item.position.z == 500)
+            item.position.set(0, 10, -1500);
+    });
+
+    index = 1;
+    vetorParedes.forEach(item => {
+        item.position.z += 1;
+        if(item.position.z == 500 && index % 2 != 0)
+        {
+            item.position.set(-200, 0, -1500);
+            index++;
+        }            
+        if(item.position.z == 500 && index % 2 == 0)
+        {
+            item.position.set(200, 0, -1500);
+            index++;
+        }   
+    });
+
+    index = 1;
+    vetorGramas.forEach(item => {
+        item.position.z += 1;
+        if(item.position.z == 500 && index % 2 != 0)
+        {
+            item.position.set(-380, 50, -1500);
+            index++;
+        }            
+        if(item.position.z == 500 && index % 2 == 0)
+        {
+            item.position.set(380, 50, -1500);
+            index++;
+        }   
     });
 }
 
@@ -234,30 +264,61 @@ var vetorTiros = [];
 var vetorInimigos = [];
 var vetorPlanos = [];
 var vetorWater = [];
-var posicoesX = [];
-var posicoesY = [];
-var posicoesZ = [];
-
+var vetorParedes = [];
+var vetorGramas = [];
 //Vetor para armazenar os inimigos mortos (auxilia na animação dos inimigos quando são atingidos):
 var killedEnemies = [];
 
 const params = {
     color: '#ffffff',
     scale: 4,
-    flowX: 1,
-    flowY: 1
+    flowX: 3,
+    flowY: 3
 };
 
 //Cria o plano
 for(let i = 0; i < 4; i++){
-    // let plane = createGroundPlaneWired(400, 500);
-    // plane.position.set(0, 0, i*-350);
-    // vetorPlanos.push(plane);
+    let plane = createPlano();
+    plane.rotateX(degreesToRadians(90));
+    plane.position.set(0, 0, i*-500);
+    // plane.position.set(0, 0, -1870);
+    scene.add(plane);
+    vetorPlanos.push(plane);
+    // let plane = createGroundPlaneWired(400, 11000);
+    // plane.position.set(0, 0, -1870);
     // scene.add(plane);
     let water = createWater();
-    water.position.set(0, 10, i*-350);
+    water.position.set(0, 10, i*-500);
     vetorWater.push(water);
     scene.add(water);
+
+    let parede1 = createWalls();  
+    parede1.rotateZ(degreesToRadians(60));
+    parede1.rotateY(degreesToRadians(90));
+    parede1.rotateZ(degreesToRadians(90));
+    parede1.position.set(-200, 0, i*-500);
+    scene.add(parede1);
+    vetorParedes.push(parede1);
+
+    let parede2 = createWalls();
+    parede2.rotateZ(degreesToRadians(-60));
+    parede2.rotateY(degreesToRadians(90));
+    parede2.rotateZ(degreesToRadians(90));
+    parede2.position.set(200, 0, i*-500);
+    scene.add(parede2);
+    vetorParedes.push(parede2);
+
+    let grama1 = createGrass();
+    grama1.rotateX(degreesToRadians(90));
+    grama1.position.set(-380, 50, i*-500);
+    scene.add(grama1);
+    vetorGramas.push(grama1);
+
+    let grama2 = createGrass();
+    grama2.rotateX(degreesToRadians(90));
+    grama2.position.set(380, 50, i*-500);
+    scene.add(grama2);
+    vetorGramas.push(grama2);
 }
 
 
@@ -274,9 +335,57 @@ function createWater(){
     water.rotation.x = Math.PI * - 0.5;
     return water;
 }
-// let plane = createGroundPlaneWired(400, 11000);
-// plane.position.set(0, 0, -1870);
-// scene.add(plane);
+
+function createWalls()
+{
+    let wallGeometry = new THREE.PlaneGeometry(200, 500);
+    let texture = 	new THREE.TextureLoader().load("./assets/textures/ground-texture.jpg");
+
+    let mat = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        color:"white",
+        map: texture,
+    });
+    mat.normalScale.set(0.7, 0.7);
+
+    let mesh = new THREE.Mesh(wallGeometry, mat);
+
+    return mesh;
+}
+
+function createPlano()
+{
+    let planeGeometry = new THREE.PlaneGeometry(400, 500);
+    let texture = 	new THREE.TextureLoader().load("./assets/textures/river-texture.jpg");
+
+    let mat = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        color:"white",
+        map: texture,
+    });
+    mat.normalScale.set(0.7, 0.7);
+
+    let mesh = new THREE.Mesh(planeGeometry, mat);
+
+    return mesh;
+}
+
+function createGrass()
+{
+    let grassGeometry = new THREE.PlaneGeometry(200, 500);
+    let texture = 	new THREE.TextureLoader().load("./assets/textures/grass-texture.jpg");
+
+    let mat = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        color:"white",
+        map: texture,
+    });
+    mat.normalScale.set(0.7, 0.7);
+
+    let mesh = new THREE.Mesh(grassGeometry, mat);
+
+    return mesh;
+}
 
 
 //                                  MODELAGEM E DINÂMICA:
@@ -304,8 +413,6 @@ loadOBJFile('./assets/plane7/', 'plane', aviao, "");
 function loadOBJFile(modelPath, modelName, object, target)
 {
   var manager = new THREE.LoadingManager( );
-  console.log(modelPath);
-  console.log(modelName);
 
   var mtlLoader = new MTLLoader( manager );
   mtlLoader.setPath( modelPath );
@@ -511,12 +618,11 @@ function createEnemies(move){
         enemy5.object.position.set(positionX5, 10, positionZ5);
         enemy5.object.material.transparent = true;
         enemy5.object.material.opacity = 0;
-        scene.add(enemy5.object);
-        vetorInimigos.push(enemy5);
+        // scene.add(enemy5.object);
+        // vetorInimigos.push(enemy5);
         pathModelo = './assets/ship3/';
         modelName = 'boat';
         setModeloInimigo(modelName, pathModelo, enemy5.object);
-        enemy5.object.position.set(0, 10, -150);
     }
 
     // meia-lua
@@ -705,7 +811,6 @@ function enemyShoot(){
             }
         }
     });
-    console.log("pey");
 }
 
 //Função que checa colisões na cena:
@@ -884,16 +989,16 @@ function enemiesCreation()
 }
 
 // Criaçao dos primeiros inimigos
-// x = Math.random()*100;
-// if(x <= 50){
-//     createEnemies("vertical");
-//     createEnemies("terrestre");
-//     createEnemies("diagonalEsquerda");
-// }else{
-//     createEnemies("Horizontal");
-//     createEnemies("diagonalDireita");
-//     createEnemies("meia-lua");
-// }
+x = Math.random()*100;
+if(x <= 50){
+    createEnemies("vertical");
+    createEnemies("terrestre");
+    createEnemies("diagonalEsquerda");
+}else{
+    createEnemies("Horizontal");
+    createEnemies("diagonalDireita");
+    createEnemies("meia-lua");
+}
 
 // createEnemies("terrestre");
 
@@ -903,29 +1008,29 @@ function render()
 {
     //Move o plano e um object3D que auxilia na criação dos inimigos, baseando-se em sua posição no eixo Y
     keyboardUpdate();
-    // if(play){
-    //     referenceObject.translateY(1); 
-    //     if(referenceObject.position.y >= 6900)
-    //         resetaJogo();
-    //     enemiesCreation();
+    if(play){
+        referenceObject.translateY(1); 
+        if(referenceObject.position.y >= 6900)
+            resetaJogo();
+        enemiesCreation();
 
-    //     //Gera os itens de cura aleatoriamente
-    //     y = Math.random()*100;
-    //     if(y >= 99.5)
-    //         createHealObject();
+        //Gera os itens de cura aleatoriamente
+        y = Math.random()*100;
+        if(y >= 99.5)
+            createHealObject();
 
-    //     //Chamada das funções no render: 
-    //     enemyShoot();
-    //     moveObjects();
-    //     atualizaBB();
-    //     checkCollisions();
-    //     animationEnemy();
-    //     animationAviao();
-    //     resetaVidas();
-    // }
+        //Chamada das funções no render: 
+        enemyShoot();
+        moveObjects();
+        atualizaBB();
+        checkCollisions();
+        animationEnemy();
+        animationAviao();
+        resetaVidas();
+    }
 
     // enemyShoot();
-    moveObjects();
+    // moveObjects();
 
     controlledRender();
     stats.update();
