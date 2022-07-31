@@ -761,6 +761,9 @@ function resetaJogo(){
     }
 }
 
+
+const clock = new THREE.Clock();
+
 //Função que anima os inimigos mortos:
 function animationEnemy()
 {
@@ -769,11 +772,11 @@ function animationEnemy()
     //Percorre o vetor auxiliar killedEnemies (inimigos mortos):
     killedEnemies.forEach(item => {
         // let auxAnimationEnemy = true;
+        scene.add(item);
         const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
         let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
         sprite.loop(values, 0.5); 
         //Adiciona o elemento na cena (O elemento é uma cópia do original):
-        scene.add(item);
         animate(sprite);
         // Diminui a escala em x,y e z da cópia:
         item.scale.x = item.scale.x - 0.1;
@@ -786,17 +789,18 @@ function animationEnemy()
         }
         contador++;
         //Quando a escala for menor que zero, remove o item da cena e do vetor auxiliar killedEnemies:
-    })
+    });
 }
 
-const clock = new THREE.Clock();
 
-function animate (sprite) {
-  let deltaTime = clock.getDelta();
-  controlledRender();
-  sprite.update(deltaTime);
-  requestAnimationFrame(animate);
-}
+function animate () {
+    if(!sprite.animacaoCompleta){
+      let deltaTime = clock.getDelta();
+      renderer.render(scene, camera);
+      sprite.update(deltaTime);
+      requestAnimationFrame(animate);
+    }  
+  }
 
 //Função que anima o avião quando colide com um inimigo:
 function animationAviao(){

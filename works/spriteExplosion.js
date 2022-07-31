@@ -9,11 +9,14 @@ class SpriteExplosion {
     #map;
     #sprite;
     #material;
+    #scene;
 
     #playSpriteIndices = [];
     #explosionTileArrayIndex = 0;
     #maxDisplayTime = 0;
     #elapsedTime = 0;
+
+    animacaoCompleta = false;
 
     constructor(spriteTexture, tilesHoriz, tilesVertic, scene){
         this.#tilesHoriz = tilesHoriz;
@@ -28,6 +31,7 @@ class SpriteExplosion {
         this.#sprite.position.y = 3;
 
         scene.add(this.#sprite);
+        this.#scene = scene;
 
         this.update(0);
     }
@@ -40,6 +44,10 @@ class SpriteExplosion {
     }
 
     update(delta) {
+        if(this.#explosionTileArrayIndex == 0 && this.#elapsedTime != 0){
+            this.animacaoCompleta = true;
+            this.#scene.remove(this.#sprite);
+        }
         this.#elapsedTime += delta;
 
         if(this.#maxDisplayTime > 0 && this.#elapsedTime >= this.#maxDisplayTime)
@@ -53,6 +61,7 @@ class SpriteExplosion {
             this.#map.offset.x = offsetX;
             this.#map.offset.y = offsetY;
         }
+        
     }
 }
 export default SpriteExplosion;

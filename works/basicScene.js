@@ -9,7 +9,7 @@ import {initRenderer,
         createGroundPlaneXZ,
         degreesToRadians} from "../libs/util/util.js";
 import { CSG } from '../libs/other/CSGMesh.js'
-import SpriteExplosion from './spriteExplosion.js';
+// import SpriteExplosion from './spriteExplosion.js';
 // import { Water } from './assets/water/Water2.js';
 
 // const params = {
@@ -87,16 +87,6 @@ function updateObject(mesh)
    mesh.updateMatrix();
 }
 
-// Animação da explosão:
-
-// let planoExplosão = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshLambertMaterial());
-
-// planoExplosão.material.side = THREE.DoubleSide;
-
-// scene.add(planoExplosão);
-
-// planoExplosão.position.set(0, 5, 0);
-
 
 // const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
 
@@ -107,11 +97,14 @@ function updateObject(mesh)
 // const clock = new THREE.Clock();
 
 // function animate () {
-//   let deltaTime = clock.getDelta();
-//   renderer.render(scene, camera);
-//   sprite.update(deltaTime);
-//   requestAnimationFrame(animate);
+//   if(!sprite.animacaoCompleta){
+//     let deltaTime = clock.getDelta();
+//     renderer.render(scene, camera);
+//     sprite.update(deltaTime);
+//     requestAnimationFrame(animate);
+//   }  
 // }
+
 
 // animate();
 // // Use this to show information onscreen
