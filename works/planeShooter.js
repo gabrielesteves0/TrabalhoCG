@@ -718,26 +718,34 @@ function animationEnemy()
     var contador = 0;
     //Percorre o vetor auxiliar killedEnemies (inimigos mortos):
     killedEnemies.forEach(item => {
-        //Adiciona o elemento na cena (O elemento é uma cópia do original):
-        scene.add(item);
-        //Diminui a escala em x,y e z da cópia:
-        // item.scale.x = item.scale.x - 0.1;
-        // item.scale.y = item.scale.y - 0.1;
-        // item.scale.z = item.scale.z - 0.1;
+        // let auxAnimationEnemy = true;
         const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
         let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
-        sprite.loop(values, 0.5);
-        const clock = new THREE.Clock();
+        sprite.loop(values, 0.5); 
+        //Adiciona o elemento na cena (O elemento é uma cópia do original):
+        scene.add(item);
+        animate(sprite);
+        // Diminui a escala em x,y e z da cópia:
+        item.scale.x = item.scale.x - 0.1;
+        item.scale.y = item.scale.y - 0.1;
+        item.scale.z = item.scale.z - 0.1;
 
-        let deltaTime = clock.getDelta();
-        sprite.update(deltaTime);
-        if(deltaTime >= 0.5){
+        if(item.scale.x <= 0){
             scene.remove(item);
             killedEnemies.splice(contador, 1);
         }
         contador++;
         //Quando a escala for menor que zero, remove o item da cena e do vetor auxiliar killedEnemies:
     })
+}
+
+const clock = new THREE.Clock();
+
+function animate (sprite) {
+  let deltaTime = clock.getDelta();
+  controlledRender();
+  sprite.update(deltaTime);
+  requestAnimationFrame(animate);
 }
 
 //Função que anima o avião quando colide com um inimigo:
