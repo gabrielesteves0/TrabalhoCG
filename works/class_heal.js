@@ -1,5 +1,5 @@
 import * as THREE from "../build/three.module.js";
-import objCura from "../works/basicScene.js";
+import objCura from "./basicScene.js";
 
 class Heal{
 
