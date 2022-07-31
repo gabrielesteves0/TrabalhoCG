@@ -340,12 +340,17 @@ function createWater(){
 function createWalls()
 {
     let wallGeometry = new THREE.PlaneGeometry(200, 500);
-    let texture = 	new THREE.TextureLoader().load("./assets/textures/ground-texture.jpg");
+    let texture = new THREE.TextureLoader().load("./assets/textures/plaster.jpg");
+    let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/plaster_normal.jpg");
+    // let texture = 	new THREE.TextureLoader().load("./assets/textures/ground-texture.jpg");
+    // let textureNormalMap = 	new THREE.TextureLoader().load("./assets/textures/ground-normalMap.jpg");
 
-    let mat = new THREE.MeshStandardMaterial({
+    let nmap = (textureNormalMap ? new THREE.TextureLoader().load(textureNormalMap) : null);
+    let mat = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
         color:"white",
         map: texture,
+        normalMap: nmap,
     });
     mat.normalScale.set(0.7, 0.7);
 
@@ -375,15 +380,23 @@ function createGrass()
 {
     let grassGeometry = new THREE.PlaneGeometry(200, 500);
     let texture = 	new THREE.TextureLoader().load("./assets/textures/grass-texture.jpg");
+    let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/grass-normal.jpg");
 
-    let mat = new THREE.MeshStandardMaterial({
+    // let nmap = (textureNormalMap ? new THREE.TextureLoader().load(textureNormalMap) : null);
+    let mat = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
         color:"white",
         map: texture,
+        // normalMap: nmap,
     });
     mat.normalScale.set(0.7, 0.7);
 
-    let mesh = new THREE.Mesh(grassGeometry, mat);
+    // let nmap = (textureNormal ? new THREE.TextureLoader().load(textureNormal) : null);
+	// var mat = new THREE.MeshPhongMaterial({
+	// 	map: texture,
+	// 	normalMap: nmap,
+	// });
+	var mesh = new THREE.Mesh(grassGeometry, mat);
 
     return mesh;
 }
@@ -703,13 +716,50 @@ function resetaJogo(){
                 vetorTiros.splice(index, 1);
                 index++;
             });
-        }
-        plane.position.set(0, 0, -4000);
+            index = 0;    
+            vetorPlanos.forEach(item => {
+                item.position.set(0,0,index*-500);
+                index++;
+            })
+            index = 0;    
+            vetorWater.forEach(item => {
+                item.position.set(0,10,index*-500);
+                index++;
+            })
+            index = 0;
+            let i = 0;    
+            vetorParedes.forEach(item => {
+                if(index != 0 && index % 2 == 0)
+                    i++;
+                if(index % 2 != 0){
+                    item.position.set(200,0,i*-500);
+                    index++;
+                }else{
+                    item.position.set(-200,0,i*-500);
+                    index++;
+                }               
+            })
+            index = 0;    
+            i = 0;
+            vetorGramas.forEach(item => {
+                if(index != 0 && index % 2 == 0)
+                    i++;
+                if(index % 2 != 0){
+                    item.position.set(380,50,i*-500);
+                    index++;
+                }else{
+                    item.position.set(-380,50,i*-500);
+                    index++;
+                }
+                
+            })
+     
         aviao.position.set(0, 50, 110);
         referenceObject.position.set(0, 0, 0);
         vidas = 0;
         resetaVidas();
     }
+}
 
 //Função que anima os inimigos mortos:
 function animationEnemy()
