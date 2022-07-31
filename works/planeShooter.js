@@ -123,11 +123,13 @@ function moveObjects(){
 
     index = 0;
     vetorTiros.forEach(item => {
+        if(item.terraAr){
+            // item.object.rotation.x -= 0.06;
+        }
         item.object.translateX(item.velocidadeX);
         item.object.translateY(item.velocidadeY);
         item.object.translateZ(item.velocidadeZ);
-        if(item.terraAr)
-            item.object.rotation.z -= 0.06;
+       
         item.object.updateMatrixWorld(true);
         if(item.object.position.y >= 50 && item.terraAr){
             item.resetVelocidadeY();
@@ -269,7 +271,6 @@ var vetorParedes = [];
 var vetorGramas = [];
 //Vetor para armazenar os inimigos mortos (auxilia na animação dos inimigos quando são atingidos):
 var killedEnemies = [];
-
 const params = {
     color: '#ffffff',
     scale: 4,
@@ -282,12 +283,8 @@ for(let i = 0; i < 4; i++){
     let plane = createPlano();
     plane.rotateX(degreesToRadians(90));
     plane.position.set(0, 0, i*-500);
-    // plane.position.set(0, 0, -1870);
     scene.add(plane);
-    vetorPlanos.push(plane);
-    // let plane = createGroundPlaneWired(400, 11000);
-    // plane.position.set(0, 0, -1870);
-    // scene.add(plane);
+    vetorPlanos.push(plane); 
     let water = createWater();
     water.position.set(0, 10, i*-500);
     vetorWater.push(water);
@@ -342,9 +339,7 @@ function createWalls()
     let wallGeometry = new THREE.PlaneGeometry(200, 500);
     let texture = new THREE.TextureLoader().load("./assets/textures/plaster.jpg");
     let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/plaster_normal.jpg");
-    // let texture = 	new THREE.TextureLoader().load("./assets/textures/ground-texture.jpg");
-    // let textureNormalMap = 	new THREE.TextureLoader().load("./assets/textures/ground-normalMap.jpg");
-
+   
     let nmap = (textureNormalMap ? new THREE.TextureLoader().load(textureNormalMap) : null);
     let mat = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
@@ -382,20 +377,13 @@ function createGrass()
     let texture = 	new THREE.TextureLoader().load("./assets/textures/grass-texture.jpg");
     let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/grass-normal.jpg");
 
-    // let nmap = (textureNormalMap ? new THREE.TextureLoader().load(textureNormalMap) : null);
     let mat = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
         color:"white",
         map: texture,
-        // normalMap: nmap,
     });
     mat.normalScale.set(0.7, 0.7);
-
-    // let nmap = (textureNormal ? new THREE.TextureLoader().load(textureNormal) : null);
-	// var mat = new THREE.MeshPhongMaterial({
-	// 	map: texture,
-	// 	normalMap: nmap,
-	// });
+    
 	var mesh = new THREE.Mesh(grassGeometry, mat);
 
     return mesh;
@@ -632,8 +620,8 @@ function createEnemies(move){
         enemy5.object.position.set(positionX5, 10, positionZ5);
         enemy5.object.material.transparent = true;
         enemy5.object.material.opacity = 0;
-        // scene.add(enemy5.object);
-        // vetorInimigos.push(enemy5);
+        scene.add(enemy5.object);
+        vetorInimigos.push(enemy5);
         pathModelo = './assets/ship3/';
         modelName = 'boat';
         setModeloInimigo(modelName, pathModelo, enemy5.object);
@@ -763,6 +751,7 @@ function resetaJogo(){
 
 
 const clock = new THREE.Clock();
+let vetorSprites = [];
 
 //Função que anima os inimigos mortos:
 function animationEnemy()
@@ -774,10 +763,10 @@ function animationEnemy()
         // let auxAnimationEnemy = true;
         scene.add(item);
         const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
-        let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
+        let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, item);
         sprite.loop(values, 0.5); 
         //Adiciona o elemento na cena (O elemento é uma cópia do original):
-        animate(sprite);
+        vetorSprites.push(sprite);
         // Diminui a escala em x,y e z da cópia:
         item.scale.x = item.scale.x - 0.1;
         item.scale.y = item.scale.y - 0.1;
@@ -788,18 +777,19 @@ function animationEnemy()
             killedEnemies.splice(contador, 1);
         }
         contador++;
-        //Quando a escala for menor que zero, remove o item da cena e do vetor auxiliar killedEnemies:
+        animate();
     });
 }
 
-
 function animate () {
-    if(!sprite.animacaoCompleta){
-      let deltaTime = clock.getDelta();
-      renderer.render(scene, camera);
-      sprite.update(deltaTime);
-      requestAnimationFrame(animate);
-    }  
+    vetorSprites.forEach(item => {
+        if(!item.animacaoCompleta){
+            let deltaTime = clock.getDelta();
+            controlledRender();
+            item.update(deltaTime);
+            requestAnimationFrame(animate);
+        }
+    })   
   }
 
 //Função que anima o avião quando colide com um inimigo:
@@ -822,11 +812,6 @@ function animationAviao(){
             aviao.material.color.setHex(0xffffff);
         }
     }
-}
-
-function animationExplosao(position){
-    let geometry = new THREE.PlaneGeometry(100,100);
-    let material = new THREE.MeshLambertMaterial({transparent : true});
 }
 
 //                                  SISTEMA DE TIRO E COLISÃO:
@@ -1052,15 +1037,14 @@ function enemiesCreation()
      if(x >= 99.2)
      {
          createEnemies("meia-lua");
-     }
-     
+     }     
  }
 
 }
 
 // Criaçao dos primeiros inimigos
 x = Math.random()*100;
-if(x <= 50){
+if(x <= 500){
     createEnemies("vertical");
     createEnemies("terrestre");
     createEnemies("diagonalEsquerda");
@@ -1098,10 +1082,6 @@ function render()
         animationAviao();
         resetaVidas();
     }
-
-    // enemyShoot();
-    // moveObjects();
-
     controlledRender();
     stats.update();
     trackballControls.update();

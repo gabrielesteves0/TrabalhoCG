@@ -30,8 +30,8 @@ class SpriteExplosion {
 
         this.#sprite.position.y = 3;
 
-        scene.add(this.#sprite);
         this.#scene = scene;
+        this.#scene.add(this.#sprite);      
 
         this.update(0);
     }
