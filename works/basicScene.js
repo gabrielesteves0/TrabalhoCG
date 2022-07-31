@@ -9,7 +9,6 @@ import {initRenderer,
         createGroundPlaneXZ,
         degreesToRadians} from "../libs/util/util.js";
 import { CSG } from '../libs/other/CSGMesh.js'
-import { AnimationClip, NumberKeyframeTrack, AnimationMixer } from 'three';
 import SpriteExplosion from './spriteExplosion.js';
 // import { Water } from './assets/water/Water2.js';
 
@@ -101,9 +100,9 @@ scene.add(plane);
 
 const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
 
-const sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
+let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
 
-sprite.loop(values, 1.5);
+sprite.loop(values, 0.5);
 
 const clock = new THREE.Clock();
 

@@ -18,6 +18,7 @@ import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import Enemies from './class_enemies.js';
 import Ammo from '../works/class_ammo.js';
 import Heal from '../works/class_heal.js';
+import SpriteExplosion from './spriteExplosion.js';
 import { Water } from './assets/water/Water2.js';
 
 // Status (FPS)
@@ -720,15 +721,22 @@ function animationEnemy()
         //Adiciona o elemento na cena (O elemento é uma cópia do original):
         scene.add(item);
         //Diminui a escala em x,y e z da cópia:
-        item.scale.x = item.scale.x - 0.1;
-        item.scale.y = item.scale.y - 0.1;
-        item.scale.z = item.scale.z - 0.1;
-        //Quando a escala for menor que zero, remove o item da cena e do vetor auxiliar killedEnemies:
-        if(item.scale.x <= 0){
+        // item.scale.x = item.scale.x - 0.1;
+        // item.scale.y = item.scale.y - 0.1;
+        // item.scale.z = item.scale.z - 0.1;
+        const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
+        let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, scene);
+        sprite.loop(values, 0.5);
+        const clock = new THREE.Clock();
+
+        let deltaTime = clock.getDelta();
+        sprite.update(deltaTime);
+        if(deltaTime >= 0.5){
             scene.remove(item);
             killedEnemies.splice(contador, 1);
         }
         contador++;
+        //Quando a escala for menor que zero, remove o item da cena e do vetor auxiliar killedEnemies:
     })
 }
 
