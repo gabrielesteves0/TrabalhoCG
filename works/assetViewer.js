@@ -4,6 +4,7 @@ import GUI from '../libs/util/dat.gui.module.js'
 import {TrackballControls} from '../build/jsm/controls/TrackballControls.js';
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
+import {PLYLoader} from '../build/jsm/loaders/PLYLoader.js';
 import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import {initRenderer, 
         SecondaryBox,
@@ -50,8 +51,9 @@ var infoBox = new SecondaryBox("");
 var objectArray = new Array();
 var activeObject = 0;
 
-loadGLTFFile('./assets/enemyPlane/', 'scene.gltf', false, 2.0);
+
 loadOBJFile('./assets/plane7/', 'plane', false, 2.0);
+loadGLTFFile('./assets/enemyPlane/', 'scene', false, 2.0);
 loadOBJFile('./assets/plane1/', 'Fighter_Plane_Sukhoi-30', false, 2.0);
 loadOBJFile('./assets/ship3/', 'boat', false, 2.0);
 loadOBJFile('./assets/missile2/', 'uploads_files_1895467_MLRS_Rocket', false, 2.0);
@@ -64,7 +66,7 @@ render();
 function loadGLTFFile(modelPath, modelName, visibility, desiredScale)
 {
   var loader = new GLTFLoader( );
-  loader.load( modelPath + modelName, function ( gltf ) {
+  loader.load( modelPath + modelName + '.gltf', function ( gltf ) {
     var obj = gltf.scene;
     obj.name = modelName;
     obj.visible = visibility;
@@ -87,9 +89,11 @@ function loadGLTFFile(modelPath, modelName, visibility, desiredScale)
     }, onProgress, onError);
 }
 
+
 function loadOBJFile(modelPath, modelName, visibility, desiredScale)
 {
   var currentModel = modelName;
+
   var manager = new THREE.LoadingManager( );
 
   var mtlLoader = new MTLLoader( manager );
@@ -111,7 +115,7 @@ function loadOBJFile(modelPath, modelName, visibility, desiredScale)
 
           obj.traverse( function( node )
           {
-            if( node.material )node.material.side = THREE.DoubleSide;
+            if( node.material ) node.material.side = THREE.DoubleSide;
           });
 
           var obj = normalizeAndRescale(obj, desiredScale);
@@ -119,6 +123,12 @@ function loadOBJFile(modelPath, modelName, visibility, desiredScale)
 
           scene.add ( obj );
           objectArray.push( obj );
+
+          // Pick the index of the first visible object
+          if(modelName == 'dolphins')
+          {
+            activeObject = objectArray.length-1;
+          }
 
         }, onProgress, onError );
   });
@@ -154,6 +164,21 @@ function fixPosition(obj)
   return obj;
 }
 
+function renderFirstObjectLoaded()
+{
+  activeObject = 0;
+  objectArray[0].visible = true;
+  if(!firstRender) firstRender = true;
+}
+
+function createSphere(radius, widthSegments, heightSegments)
+{
+  var geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments, 0, Math.PI * 2, 0, Math.PI);
+  var material = new THREE.MeshBasicMaterial({color:"rgb(255,255,50)"});
+  var object = new THREE.Mesh(geometry, material);
+    object.castShadow = true;
+  return object;
+}
 
 function buildInterface()
 {
@@ -178,7 +203,8 @@ function buildInterface()
   // GUI interface
   var gui = new GUI();
   gui.add(controls, 'type',
-    ['Object0', 'Object1', 'Object2', 'Object3', 'Object4', 'Object 5'])
+    ['Object0', 'Object1', 'Object2', 'Object3',
+      'Object4', 'Object5'])
     .name("Change Object")
     .onChange(function(e) { controls.onChooseObject(); });
   gui.add(controls, 'viewAxes', false)
