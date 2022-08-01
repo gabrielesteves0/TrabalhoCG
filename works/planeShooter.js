@@ -16,9 +16,8 @@ import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
 import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import Enemies from './class_enemies.js';
-import Ammo from '../works/class_ammo.js';
-import Heal from '../works/class_heal.js';
-import SpriteExplosion from './spriteExplosion.js';
+import Ammo from './class_ammo.js';
+import Heal from './class_heal.js';
 import { Water } from './assets/water/Water2.js';
 
 // Status (FPS)
@@ -338,7 +337,7 @@ function createWalls()
 {
     let wallGeometry = new THREE.PlaneGeometry(200, 500);
     let texture = new THREE.TextureLoader().load("./assets/textures/plaster.jpg");
-    let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/plaster_normal.jpg");
+    let textureNormalMap = "./assets/textures/plaster_normal.jpg";
    
     let nmap = (textureNormalMap ? new THREE.TextureLoader().load(textureNormalMap) : null);
     let mat = new THREE.MeshPhongMaterial({
@@ -357,7 +356,7 @@ function createWalls()
 function createPlano()
 {
     let planeGeometry = new THREE.PlaneGeometry(400, 500);
-    let texture = 	new THREE.TextureLoader().load("./assets/textures/river-texture.jpg");
+    let texture = new THREE.TextureLoader().load("./assets/textures/river-texture.jpg");
 
     let mat = new THREE.MeshStandardMaterial({
         side: THREE.DoubleSide,
@@ -375,7 +374,6 @@ function createGrass()
 {
     let grassGeometry = new THREE.PlaneGeometry(200, 500);
     let texture = 	new THREE.TextureLoader().load("./assets/textures/grass-texture.jpg");
-    let textureNormalMap = new THREE.TextureLoader().load("./assets/textures/grass-normal.jpg");
 
     let mat = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
@@ -541,7 +539,6 @@ function createEnemies(move){
         modelName = 'scene';
         pathModelo = './assets/enemyPlane/';
     }
-
     //vertical
     if(move == "vertical")
     {
@@ -749,10 +746,6 @@ function resetaJogo(){
     }
 }
 
-
-const clock = new THREE.Clock();
-let vetorSprites = [];
-
 //Função que anima os inimigos mortos:
 function animationEnemy()
 {
@@ -762,11 +755,7 @@ function animationEnemy()
     killedEnemies.forEach(item => {
         // let auxAnimationEnemy = true;
         scene.add(item);
-        const values = [2, 6, 8, 9, 10, 3, 7, 11, 15, 12, 13, 14, 0, 1, 4, 5];
-        let sprite = new SpriteExplosion("./assets/textures/sprite-explosion.png", 4, 4, item);
-        sprite.loop(values, 0.5); 
         //Adiciona o elemento na cena (O elemento é uma cópia do original):
-        vetorSprites.push(sprite);
         // Diminui a escala em x,y e z da cópia:
         item.scale.x = item.scale.x - 0.1;
         item.scale.y = item.scale.y - 0.1;
@@ -777,20 +766,8 @@ function animationEnemy()
             killedEnemies.splice(contador, 1);
         }
         contador++;
-        animate();
     });
 }
-
-function animate () {
-    vetorSprites.forEach(item => {
-        if(!item.animacaoCompleta){
-            let deltaTime = clock.getDelta();
-            controlledRender();
-            item.update(deltaTime);
-            requestAnimationFrame(animate);
-        }
-    })   
-  }
 
 //Função que anima o avião quando colide com um inimigo:
 function animationAviao(){
@@ -1054,7 +1031,6 @@ if(x <= 500){
     createEnemies("meia-lua");
 }
 
-// createEnemies("terrestre");
 
 render();
 
